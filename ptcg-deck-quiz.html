@@ -1,0 +1,889 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>测测你的卡组</title>
+  <style>
+    :root{
+      --bg:#0b1220;--card:#111a2e;--card2:#0f172a;--text:#e5e7eb;--muted:#9ca3af;
+      --accent:#60a5fa;--accent2:#34d399;--danger:#fb7185;--border:#22314f;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(1200px 700px at 30% 10%, #13264d 0%, var(--bg) 55%);color:var(--text)}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+    .topbar{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+    .title h1{font-size:22px;margin:0 0 6px}
+    .title p{margin:0;color:var(--muted);line-height:1.4}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(17,26,46,.65);color:var(--muted);font-size:12px}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg, rgba(17,26,46,.92), rgba(15,23,42,.92));border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.28)}
+    .progress{height:10px;background:#0a0f1c;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s ease}
+    .qhead{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px}
+    .qnum{color:var(--muted);font-size:12px}
+    .qtext{font-size:18px;line-height:1.4;margin:8px 0 12px}
+    .opts{display:grid;gap:10px}
+    button.opt{
+      text-align:left;cursor:pointer;border-radius:14px;border:1px solid var(--border);
+      padding:12px 14px;background:rgba(9,14,26,.6);color:var(--text);line-height:1.35;
+      transition:transform .05s ease, border-color .2s ease, background .2s ease;
+    }
+    button.opt:hover{border-color:#315a98;background:rgba(12,18,34,.85)}
+    button.opt:active{transform:translateY(1px)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{
+      cursor:pointer;border-radius:12px;border:1px solid var(--border);
+      padding:10px 12px;background:rgba(9,14,26,.6);color:var(--text)
+    }
+    .btn:hover{border-color:#315a98}
+    .btn.primary{border-color:#2a67c7;background:rgba(33,95,196,.25)}
+    .btn.danger{border-color:#7f2334;background:rgba(251,113,133,.12)}
+    .small{font-size:12px;color:var(--muted);line-height:1.5}
+    .hidden{display:none !important}
+    .kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+    .kpi .box{border:1px solid var(--border);border-radius:14px;padding:10px;background:rgba(9,14,26,.45)}
+    .kpi .label{color:var(--muted);font-size:12px}
+    .kpi .val{font-size:14px;margin-top:3px}
+    .tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(9,14,26,.5);font-size:12px;color:var(--muted);margin-right:6px;margin-top:6px}
+    .result-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .result-title h2{margin:0;font-size:20px}
+    .deckcard{margin-top:14px;border:1px solid var(--border);border-radius:16px;padding:14px;background:rgba(9,14,26,.45)}
+    .deckname{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+    .deckname .cn{font-weight:700}
+    .deckname .en{color:var(--muted)}
+    .deckhero{display:flex;gap:12px;align-items:center}
+    .deckimg{
+      width:84px;height:84px;flex:0 0 84px;border-radius:14px;
+      border:1px solid var(--border);background:rgba(255,255,255,.04);
+      padding:10px;object-fit:contain;
+    }
+    .deckimg.small{width:56px;height:56px;flex-basis:56px;padding:8px;border-radius:12px}
+    .why{margin:10px 0 0;padding-left:18px;color:var(--text);line-height:1.55}
+    .why li{margin:6px 0}
+    .alts{display:grid;gap:10px;margin-top:12px}
+    .alts .alt{border:1px solid var(--border);border-radius:14px;padding:12px;background:rgba(9,14,26,.35)}
+    .footer-note{margin-top:14px;padding:10px 12px;border-radius:12px;border:1px dashed #35527b;color:var(--muted);background:rgba(9,14,26,.25);line-height:1.55}
+    .author{margin-top:10px;color:var(--muted);font-size:12px;text-align:right}
+    .sharebox{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+    .sharepreview{margin-top:10px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:rgba(9,14,26,.35)}
+    .sharepreview img{display:block;width:100%;height:auto}
+
+    @media (max-width: 520px){
+      .wrap{padding:18px 12px 42px}
+      .title h1{font-size:18px}
+      .qtext{font-size:16px}
+      button.opt{padding:12px 12px}
+      .deckhero{gap:10px}
+      .deckimg{width:72px;height:72px;flex-basis:72px}
+      .deckimg.small{width:52px;height:52px;flex-basis:52px}
+      .kpi{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>测测你的卡组</h1>
+        <p>12道题，生成你的「风格画像」，再分配一套适合你的标准赛制卡组（BRS–SSP，参考 Limitless 全时期积分榜前列卡组）。</p>
+      </div>
+      <div class="pill" id="formatPill">数据源：Limitless（BRS–SSP）</div>
+    </div>
+    <div class="author">by 牛油果</div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="progress" aria-label="进度条"><div class="bar" id="bar"></div></div>
+        <div class="qhead">
+          <div class="qnum" id="qnum">准备开始</div>
+          <div class="row">
+            <button class="btn" id="btnBack" type="button">上一步</button>
+            <button class="btn danger" id="btnReset" type="button">重来</button>
+          </div>
+        </div>
+        <div id="quiz">
+          <div class="qtext" id="qtext">点击「开始测试」进入题目。</div>
+          <div class="row">
+            <button class="btn primary" id="btnStart" type="button">开始测试</button>
+          </div>
+        </div>
+
+        <div id="result" class="hidden">
+          <div class="result-title">
+            <h2>你的推荐卡组</h2>
+            <div class="row">
+              <button class="btn primary" id="btnRetake" type="button">再测一次</button>
+            </div>
+          </div>
+          <div class="deckcard" id="bestCard"></div>
+          <div class="deckcard">
+            <div style="font-weight:700;margin-bottom:8px;">分享</div>
+            <div class="small">生成一张结果图（适合手机发群/发朋友圈）。如果图里宝可梦头像加载失败，会自动用纯文字版。</div>
+            <div class="sharebox">
+              <button class="btn primary" id="btnMakeShare" type="button">生成分享图</button>
+              <button class="btn" id="btnDownloadShare" type="button" disabled>下载PNG</button>
+              <button class="btn" id="btnShareSystem" type="button" disabled>系统分享</button>
+            </div>
+            <div class="sharepreview hidden" id="sharePreviewWrap">
+              <img id="sharePreview" alt="分享图预览" />
+            </div>
+          </div>
+          <div class="deckcard">
+            <div style="font-weight:700;margin-bottom:8px;">备选推荐（Top 3 匹配）</div>
+            <div class="alts" id="alts"></div>
+          </div>
+          <div class="footer-note">
+            这是一个可快速校验逻辑的原型：<b>中文译名、题目倾向、卡组标签都可以你来改</b>。你看完后告诉我：哪些译名要换、哪些卡组更应该“快攻/控制/复杂”，我再按你的口径精修。
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700">你的性格维度（实时）</div>
+        <div class="small">每题三选一（偏左 / 中间 / 偏右）。系统会生成你的“风格画像”，再匹配更适合你的卡组（并做均衡，让各卡组出现概率更平均）。</div>
+        <div class="kpi" id="kpis"></div>
+        <div style="margin-top:12px;font-weight:700">维度解释</div>
+        <div class="small" style="margin-top:6px">
+          <div><b>行动速度</b>：越高越“先做再说”，喜欢快速推进。</div>
+          <div><b>思考复杂度</b>：越高越爱规划/推演，享受多方案与细节。</div>
+          <div><b>冒险倾向</b>：越高越敢赌一把，用波动换取上限。</div>
+          <div><b>掌控倾向</b>：越高越想掌控局面（规则/限制/把变量握在手里）。</div>
+          <div><b>耐心/长期主义</b>：越高越能做长线决策，愿意慢慢滚雪球。</div>
+        </div>
+        <div style="margin-top:12px" class="small">
+          数据链接：<a href="https://limitlesstcg.com/decks?time=all&type=all&format=BRS-SSP&region=all&division=all" target="_blank" rel="noreferrer">Limitless Decks（BRS–SSP）</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 维度：0-100
+    const dims = [
+      { key: "pace", name: "行动速度", low: "慢热", high: "快节奏" },
+      { key: "complex", name: "思考复杂度", low: "直觉派", high: "策略派" },
+      { key: "risk", name: "冒险倾向", low: "求稳", high: "敢赌" },
+      { key: "control", name: "掌控倾向", low: "随性", high: "强掌控" },
+      { key: "patience", name: "耐心/长期主义", low: "短线", high: "长线" },
+    ];
+
+    // Limitless（BRS–SSP，time=all）——原型：中文译名与标签可后续按你口径校验/调整
+    const decks = [
+      { id: 260, en: "Regidrago VSTAR", cn: "雷吉铎拉戈VSTAR", icon: "regidrago", tags: ["工具箱","高上限","线路多"],
+        vec: { pace: 70, complex: 70, risk: 70, control: 45, patience: 60 },
+        reason: "多路线工具箱：根据对局选择不同招式与线路，适合爱规划、临场应变强的人。" },
+      { id: 264, en: "Charizard ex", cn: "喷火龙ex", icon: "charizard", tags: ["中速","稳定","强终结"],
+        vec: { pace: 50, complex: 60, risk: 45, control: 40, patience: 55 },
+        reason: "节奏稳定、容错高：前中期铺垫，后期火力强，适合“想稳又想赢得干净”的风格。" },
+      { id: 255, en: "Gardevoir ex", cn: "沙奈朵ex", icon: "gardevoir", tags: ["长局","资源管理","操作细"],
+        vec: { pace: 40, complex: 85, risk: 55, control: 55, patience: 85 },
+        reason: "资源与顺序细节很多，常要算伤害与资源回收；耐心型玩家会越打越强。" },
+      { id: 269, en: "Klawf Unhinged Scissors", cn: "毛崖蟹（失控剪刀）", icon: "klawf", tags: ["节奏","爆发","灵活单奖"],
+        vec: { pace: 75, complex: 55, risk: 65, control: 35, patience: 40 },
+        reason: "节奏快、抓窗口能力强；适合喜欢快速施压、敢在关键回合搏一把的人。" },
+      { id: 247, en: "Lugia Archeops", cn: "洛奇亚/始祖大鸟", icon: "lugia", tags: ["展开","上限高","爆发"],
+        vec: { pace: 65, complex: 65, risk: 70, control: 35, patience: 50 },
+        reason: "成型后爆发强，但更吃展开与时机；适合喜欢“做成就翻盘”的打法。" },
+      { id: 280, en: "Raging Bolt ex", cn: "猛雷鼓ex", icon: "raging-bolt", tags: ["快攻","直来直去","压血线"],
+        vec: { pace: 90, complex: 40, risk: 60, control: 25, patience: 25 },
+        reason: "开局就想打出节奏、迅速换取奖赏；适合急性子、偏进攻的人。" },
+      { id: 259, en: "Snorlax Stall PGO", cn: "卡比兽消耗（Stall）", icon: "snorlax", tags: ["消耗","锁资源","超长局"],
+        vec: { pace: 10, complex: 70, risk: 35, control: 95, patience: 95 },
+        reason: "通过限制与消耗让对手逐步失去行动；适合非常有耐心、喜欢掌控节奏的人。" },
+      { id: 292, en: "Terapagos ex", cn: "太乐巴戈斯ex（太晶龟）", icon: "terapagos", tags: ["中速","变招","稳中求胜"],
+        vec: { pace: 55, complex: 60, risk: 45, control: 45, patience: 60 },
+        reason: "玩法偏中速与适配：既能打正面也能调节线路，适合不想被单一思路限制的人。" },
+      { id: 284, en: "Dragapult ex", cn: "多龙巴鲁托ex", icon: "dragapult", tags: ["节奏","点杀/铺伤","对局理解"],
+        vec: { pace: 65, complex: 70, risk: 50, control: 55, patience: 60 },
+        reason: "需要把握节奏与伤害分配；适合心细、喜欢“每回合都做正确事”的玩家。" },
+      { id: 315, en: "Archaludon ex", cn: "铝钢龙ex", icon: "archaludon", tags: ["耐久","对抗快攻","慢速滚雪球"],
+        vec: { pace: 40, complex: 60, risk: 40, control: 55, patience: 75 },
+        reason: "偏防守与耐久，对位与资源节奏重要；适合稳健、愿意慢慢扩大优势的人。" },
+      { id: 267, en: "Gholdengo ex", cn: "赛富豪ex", icon: "gholdengo", tags: ["爆发","手牌管理","组合"],
+        vec: { pace: 60, complex: 75, risk: 65, control: 35, patience: 55 },
+        reason: "靠资源转换打爆发，手牌与资源管理关键；适合喜欢“算牌/算线”的人。" },
+      { id: 227, en: "Palkia VSTAR", cn: "帕路奇亚VSTAR", icon: "palkia", tags: ["中速","稳定","场面控制"],
+        vec: { pace: 60, complex: 55, risk: 45, control: 45, patience: 55 },
+        reason: "稳定中速：既能快速进入战斗，也能做场面运营；适合均衡型玩家。" },
+      { id: 268, en: "Roaring Moon ex", cn: "轰鸣月ex", icon: "roaring-moon", tags: ["快攻","高压","换血取胜"],
+        vec: { pace: 85, complex: 55, risk: 75, control: 30, patience: 30 },
+        reason: "用高压节奏逼对手失误，但也更吃取舍；适合敢换血、追求压制的人。" },
+      { id: 241, en: "Lost Zone Box", cn: "LTB", icon: "comfey", tags: ["超高操作","多分支","节奏"],
+        vec: { pace: 75, complex: 95, risk: 60, control: 55, patience: 65 },
+        reason: "选择题很多：每回合都在做路线决策；适合享受高强度思考与微操的人。" },
+      { id: 276, en: "Pidgeot Control", cn: "大比鸟控制", icon: "pidgeot", tags: ["控制","针对性强","读牌"],
+        vec: { pace: 25, complex: 85, risk: 40, control: 90, patience: 85 },
+        reason: "更像“解题”：通过限制与针对组件拆掉对手；适合喜欢把对手锁死的人。" },
+      { id: 283, en: "Iron Thorns ex", cn: "铁荆棘ex", icon: "iron-thorns", tags: ["干扰","半控制","反展开"],
+        vec: { pace: 45, complex: 60, risk: 45, control: 75, patience: 65 },
+        reason: "通过干扰破坏对手展开；适合喜欢对抗、爱找对手别扭但又不想极端长局的人。" },
+      { id: 273, en: "Ancient Box", cn: "古代box", icon: "koraidon", tags: ["节奏","稳中带爆发","单奖/多奖混"],
+        vec: { pace: 70, complex: 70, risk: 60, control: 40, patience: 55 },
+        reason: "节奏与运营并存：既要压节奏也要管资源；适合“能快也能稳”的人。" },
+      { id: 257, en: "Miraidon ex", cn: "密勒顿ex", icon: "miraidon", tags: ["快攻","展开简单","打点直接"],
+        vec: { pace: 85, complex: 35, risk: 55, control: 25, patience: 25 },
+        reason: "展开直观，主打速度与打点；适合喜欢干脆利落、不想纠结太多的人。" },
+      { id: 299, en: "Ceruledge ex", cn: "苍炎刃鬼ex", icon: "ceruledge", tags: ["进攻","节奏","爆发回合"],
+        vec: { pace: 75, complex: 55, risk: 65, control: 30, patience: 40 },
+        reason: "靠关键回合打出爆发与转折；适合喜欢抓时机、追求爽感的人。" },
+    ];
+
+    // 12 道三选题：4 个维度 × 每个 3 题（题面不贴卡组/不贴打牌语境；内部用“性格轴”推导风格画像）
+    const questions = [
+      // 能量题（偏外向互动 vs 偏内向独处）
+      { sec: "energy", text: "周末突然空出半天，你更想怎么过？", opts: [
+        { t: "约朋友/出门走走", axis: "ei", val: +1 },
+        { t: "看心情（都行）", axis: "ei", val: 0 },
+        { t: "宅家独处/自己充电", axis: "ei", val: -1 },
+      ]},
+      { sec: "energy", text: "在一群人里，你更像哪种角色？", opts: [
+        { t: "主动聊/带节奏", axis: "ei", val: +1 },
+        { t: "看情况参与", axis: "ei", val: 0 },
+        { t: "更爱听/观察", axis: "ei", val: -1 },
+      ]},
+      { sec: "energy", text: "压力上来时，你更倾向先怎么处理？", opts: [
+        { t: "先找人聊聊", axis: "ei", val: +1 },
+        { t: "都可以", axis: "ei", val: 0 },
+        { t: "先自己消化", axis: "ei", val: -1 },
+      ]},
+
+      // 信息题（偏细节现实 vs 偏抽象可能）
+      { sec: "observe", text: "你做事更依赖什么？", opts: [
+        { t: "经验/细节/落地", axis: "sn", val: -1 },
+        { t: "都重要", axis: "sn", val: 0 },
+        { t: "灵感/可能性/脑洞", axis: "sn", val: +1 },
+      ]},
+      { sec: "observe", text: "别人讲一件事，你更在意？", opts: [
+        { t: "细节/证据", axis: "sn", val: -1 },
+        { t: "都听", axis: "sn", val: 0 },
+        { t: "意义/走向", axis: "sn", val: +1 },
+      ]},
+      { sec: "observe", text: "学一个新东西，你更常用的方式是？", opts: [
+        { t: "先照着做一遍", axis: "sn", val: -1 },
+        { t: "边做边摸索", axis: "sn", val: 0 },
+        { t: "先搞懂原理", axis: "sn", val: +1 },
+      ]},
+
+      // 决策题（偏理性标准 vs 偏感受关系）
+      { sec: "decide", text: "做决定时你更偏向？", opts: [
+        { t: "利弊/效率优先", axis: "tf", val: +1 },
+        { t: "综合看", axis: "tf", val: 0 },
+        { t: "感受/关系优先", axis: "tf", val: -1 },
+      ]},
+      { sec: "decide", text: "和人有分歧时，你更常先做？", opts: [
+        { t: "先讲清逻辑", axis: "tf", val: +1 },
+        { t: "看情况", axis: "tf", val: 0 },
+        { t: "先照顾情绪", axis: "tf", val: -1 },
+      ]},
+      { sec: "decide", text: "你判断一件事“做得好不好”更看重？", opts: [
+        { t: "结果/质量", axis: "tf", val: +1 },
+        { t: "都看", axis: "tf", val: 0 },
+        { t: "过程/感受", axis: "tf", val: -1 },
+      ]},
+
+      // 节奏题（偏计划掌控 vs 偏弹性应变）
+      { sec: "life", text: "临近出门，你更像？", opts: [
+        { t: "提前准备好", axis: "jp", val: +1 },
+        { t: "随便", axis: "jp", val: 0 },
+        { t: "到点就走", axis: "jp", val: -1 },
+      ]},
+      { sec: "life", text: "你的待办清单更像？", opts: [
+        { t: "写得很细", axis: "jp", val: +1 },
+        { t: "偶尔写", axis: "jp", val: 0 },
+        { t: "基本不写", axis: "jp", val: -1 },
+      ]},
+      { sec: "life", text: "计划被打乱时，你更像？", opts: [
+        { t: "先重排到可控", axis: "jp", val: +1 },
+        { t: "都可以", axis: "jp", val: 0 },
+        { t: "走着看再说", axis: "jp", val: -1 },
+      ]},
+    ];
+
+    const sectionNames = { energy: "能量题", observe: "信息题", decide: "决策题", life: "节奏题" };
+    function sectionProgress(i){
+      const sec = questions[i]?.sec ?? "energy";
+      let total = 0, before = 0;
+      for (let k=0;k<questions.length;k++){
+        if (questions[k].sec === sec) total++;
+        if (k < i && questions[k].sec === sec) before++;
+      }
+      return { sec, secName: sectionNames[sec] ?? sec, pos: before + 1, total };
+    }
+
+    // --- 状态 ---
+    let idx = -1;
+    let answers = []; // 每题选择的 option index
+    let score = initScore();
+
+    // --- UI refs ---
+    const $ = (id) => document.getElementById(id);
+    const bar = $("bar");
+    const qnum = $("qnum");
+    const qtext = $("qtext");
+    const quiz = $("quiz");
+    const result = $("result");
+    const kpis = $("kpis");
+    const btnStart = $("btnStart");
+    const btnBack = $("btnBack");
+    const btnReset = $("btnReset");
+    const btnRetake = $("btnRetake");
+    const btnReset2 = $("btnRetake");
+
+    function initScore(){
+      const s = {};
+      for (const d of dims) s[d.key] = 50; // 从中位数开始
+      return s;
+    }
+
+    function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+
+    function recalcScoreFromAnswers(){
+      const ax = axesFromAnswers();
+      score = scoreFromAxes(ax);
+      renderKpis();
+    }
+
+    function axesFromAnswers(){
+      const a = { ei: 0, sn: 0, tf: 0, jp: 0 };
+      const n = { ei: 0, sn: 0, tf: 0, jp: 0 };
+      for (let i=0;i<answers.length;i++){
+        const oi = answers[i];
+        if (oi == null) continue;
+        const opt = questions[i].opts[oi];
+        if (!opt || !opt.axis) continue;
+        a[opt.axis] += opt.val;
+        n[opt.axis] += 1;
+      }
+      for (const k of Object.keys(a)){
+        a[k] = n[k] ? (a[k] / n[k]) : 0; // 归一化到 [-1, 1]
+      }
+      return a;
+    }
+
+    function scoreFromAxes(ax){
+      // ax.ei: +1 更外放更爱互动；-1 更内向更爱独处
+      // ax.sn: +1 更偏抽象/联想；-1 更偏具体/细节
+      // ax.tf: +1 更偏理性/标准；-1 更偏感受/关系
+      // ax.jp: +1 更偏计划/掌控；-1 更偏随性/弹性
+      return {
+        pace: clamp(50 + 16*ax.ei - 14*ax.jp + 6*ax.sn, 0, 100),
+        complex: clamp(50 + 22*ax.sn + 6*ax.tf + 2*ax.jp, 0, 100),
+        risk: clamp(50 - 16*ax.jp + 10*ax.sn + 6*ax.ei, 0, 100),
+        control: clamp(50 + 20*ax.jp + 6*ax.tf - 4*ax.ei, 0, 100),
+        patience: clamp(50 + 18*ax.jp - 10*ax.ei + 4*ax.tf, 0, 100),
+      };
+    }
+
+    function renderKpis(){
+      kpis.innerHTML = "";
+      for (const d of dims){
+        const v = score[d.key];
+        const box = document.createElement("div");
+        box.className = "box";
+        box.innerHTML = `
+          <div class="label">${d.name}</div>
+          <div class="val">${v}/100 <span style="color:var(--muted);font-size:12px">（${v<50?d.low:d.high}）</span></div>
+          <div class="progress" style="margin-top:8px;height:8px">
+            <div class="bar" style="width:${v}%;background:linear-gradient(90deg,#38bdf8,#34d399)"></div>
+          </div>
+        `;
+        kpis.appendChild(box);
+      }
+    }
+
+    function renderQuestion(){
+      const total = questions.length;
+      const q = questions[idx];
+      const sp = sectionProgress(idx);
+      qnum.textContent = `${sp.secName} ${sp.pos}/${sp.total} · 第 ${idx+1}/${total} 题`;
+      qtext.textContent = q.text;
+      bar.style.width = `${Math.round(((idx) / total) * 100)}%`;
+
+      // options
+      let html = `<div class="opts">`;
+      q.opts.forEach((o, i) => {
+        html += `<button type="button" class="opt" data-i="${i}">${o.t}</button>`;
+      });
+      html += `</div>`;
+      quiz.innerHTML = `<div class="qtext" id="qtext">${q.text}</div>${html}`;
+
+      // rebind qtext ref (replaced)
+      const qtext2 = quiz.querySelector("#qtext");
+      qtext2 && (qtext2.id = "qtext"); // keep id stable
+
+      quiz.querySelectorAll("button.opt").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.getAttribute("data-i"));
+          answers[idx] = i;
+          recalcScoreFromAnswers();
+          next();
+        });
+      });
+
+      btnBack.disabled = idx <= 0;
+    }
+
+    function start(){
+      idx = 0;
+      answers = Array(questions.length).fill(null);
+      score = initScore();
+      result.classList.add("hidden");
+      quiz.classList.remove("hidden");
+      recalcScoreFromAnswers();
+      renderQuestion();
+    }
+
+    function reset(){
+      idx = -1;
+      answers = [];
+      score = initScore();
+      qnum.textContent = "准备开始";
+      bar.style.width = "0%";
+      result.classList.add("hidden");
+      quiz.classList.remove("hidden");
+      quiz.innerHTML = `
+        <div class="qtext" id="qtext">点击「开始测试」进入题目。</div>
+        <div class="row">
+          <button class="btn primary" id="btnStart2" type="button">开始测试</button>
+        </div>
+      `;
+      quiz.querySelector("#btnStart2").addEventListener("click", start);
+      renderKpis();
+      btnBack.disabled = true;
+    }
+
+    function next(){
+      if (idx < questions.length - 1){
+        idx++;
+        renderQuestion();
+        return;
+      }
+      finish();
+    }
+
+    function back(){
+      if (idx <= 0) return;
+      idx--;
+      renderQuestion();
+    }
+
+    function dist2(a, b){
+      // 距离平方（用于比较，不用开方更快）
+      let s = 0;
+      for (const d of dims){
+        const w = (d.key === "pace" || d.key === "control") ? 1.15 : 1.0;
+        const diff = (a[d.key] - b[d.key]);
+        s += w * diff * diff;
+      }
+      return s;
+    }
+
+    // ---- 均衡：让“落到某个卡组”的概率尽量平均（基于随机答题模拟做校准）----
+    // 注意：这不是完全随机分配，而是在“相似度匹配”的基础上加一个 per-deck 偏置项做均衡。
+    let deckBias = null; // Array<number>，与 decks 顺序一致
+
+    function randomInt(n){ return Math.floor(Math.random() * n); }
+
+    function simulateScoreOnce(){
+      const tmpAnswers = [];
+      for (let i=0;i<questions.length;i++){
+        tmpAnswers.push(randomInt(questions[i].opts.length)); // 三选：0/1/2
+      }
+      // 复用 axesFromAnswers 逻辑：临时替换 answers
+      const old = answers;
+      answers = tmpAnswers;
+      const ax = axesFromAnswers();
+      const sc = scoreFromAxes(ax);
+      answers = old;
+      return sc;
+    }
+
+    function bestDeckIndexForScore(sc, bias){
+      let bestI = 0;
+      let bestV = -Infinity;
+      for (let i=0;i<decks.length;i++){
+        const v = -(dist2(sc, decks[i].vec)) + (bias ? bias[i] : 0);
+        if (v > bestV){ bestV = v; bestI = i; }
+      }
+      return bestI;
+    }
+
+    function calibrateDeckBias(){
+      const n = decks.length;
+      let bias = Array(n).fill(0);
+      const target = 1 / n;
+      const iters = 10;
+      const samples = 900; // 手机端更快一些
+      const lr = 1.4;
+
+      for (let it=0; it<iters; it++){
+        const cnt = Array(n).fill(0);
+        for (let s=0; s<samples; s++){
+          const sc = simulateScoreOnce();
+          const bi = bestDeckIndexForScore(sc, bias);
+          cnt[bi] += 1;
+        }
+        for (let i=0;i<n;i++){
+          const p = cnt[i] / samples;
+          bias[i] += lr * (target - p);
+        }
+      }
+      return bias;
+    }
+
+    function finish(){
+      bar.style.width = "100%";
+      qnum.textContent = "完成";
+      quiz.classList.add("hidden");
+      result.classList.remove("hidden");
+
+      const ranked = decks
+        .map((deck, i) => ({
+          deck,
+          v: -(dist2(score, deck.vec)) + (deckBias ? deckBias[i] : 0),
+          d2: dist2(score, deck.vec),
+        }))
+        .sort((x,y) => y.v - x.v);
+
+      const best = ranked[0].deck;
+      const top3 = ranked.slice(0,3).map(x => x.deck);
+      // 保存给分享图使用
+      lastResult = { best, top3 };
+
+      $("bestCard").innerHTML = renderDeck(best, true);
+      const altsEl = $("alts");
+      altsEl.innerHTML = "";
+      top3.forEach((d, i) => {
+        const div = document.createElement("div");
+        div.className = "alt";
+        div.innerHTML = renderDeck(d, i === 0);
+        altsEl.appendChild(div);
+      });
+
+      // reset share UI
+      shareDataUrl = null;
+      $("btnDownloadShare").disabled = true;
+      $("btnShareSystem").disabled = true;
+      $("sharePreviewWrap").classList.add("hidden");
+    }
+
+    // ---- 分享图生成（canvas）----
+    let lastResult = null;
+    let shareDataUrl = null;
+
+    async function loadImageAsBitmap(url){
+      // 尝试用 fetch 把图片转 blob 再画到 canvas，尽量规避跨域污染
+      try{
+        const res = await fetch(url, { mode: "cors" });
+        if (!res.ok) throw new Error("fetch failed");
+        const blob = await res.blob();
+        const bmp = await createImageBitmap(blob);
+        return bmp;
+      }catch(e){
+        return null;
+      }
+    }
+
+    function roundRect(ctx, x, y, w, h, r){
+      const rr = Math.min(r, w/2, h/2);
+      ctx.beginPath();
+      ctx.moveTo(x+rr, y);
+      ctx.arcTo(x+w, y, x+w, y+h, rr);
+      ctx.arcTo(x+w, y+h, x, y+h, rr);
+      ctx.arcTo(x, y+h, x, y, rr);
+      ctx.arcTo(x, y, x+w, y, rr);
+      ctx.closePath();
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines){
+      const words = text.split("");
+      let line = "";
+      let lines = 0;
+      for (let i=0;i<words.length;i++){
+        const test = line + words[i];
+        if (ctx.measureText(test).width > maxWidth && line){
+          ctx.fillText(line, x, y);
+          y += lineHeight;
+          line = words[i];
+          lines++;
+          if (lines >= (maxLines-1)) break;
+        }else{
+          line = test;
+        }
+      }
+      if (line && lines < maxLines){
+        ctx.fillText(line, x, y);
+      }
+    }
+
+    async function generateShareImage(){
+      if (!lastResult) return;
+      const deck = lastResult.best;
+      const iconUrl = `https://r2.limitlesstcg.net/pokemon/gen9/${deck.icon}.png`;
+
+      const W = 1080, H = 1350;
+      const canvas = document.createElement("canvas");
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext("2d");
+
+      // 背景
+      const g = ctx.createRadialGradient(W*0.28, H*0.12, 10, W*0.28, H*0.12, H*0.9);
+      g.addColorStop(0, "#13264d");
+      g.addColorStop(0.55, "#0b1220");
+      g.addColorStop(1, "#070c16");
+      ctx.fillStyle = g;
+      ctx.fillRect(0,0,W,H);
+
+      // 标题
+      ctx.fillStyle = "#e5e7eb";
+      ctx.font = "700 52px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.fillText("测测你的卡组", 70, 120);
+      ctx.fillStyle = "#9ca3af";
+      ctx.font = "400 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.fillText("你的推荐卡组", 70, 170);
+
+      // 卡片容器
+      ctx.fillStyle = "rgba(9,14,26,0.55)";
+      ctx.strokeStyle = "rgba(34,49,79,1)";
+      ctx.lineWidth = 2;
+      roundRect(ctx, 60, 220, 960, 520, 34);
+      ctx.fill();
+      ctx.stroke();
+
+      // 宝可梦头像（可选）
+      const bmp = await loadImageAsBitmap(iconUrl);
+      if (bmp){
+        // 头像底
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        roundRect(ctx, 90, 260, 180, 180, 34);
+        ctx.fill();
+        ctx.drawImage(bmp, 110, 280, 140, 140);
+      }
+
+      // 卡组名
+      ctx.fillStyle = "#e5e7eb";
+      ctx.font = "800 54px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.fillText(deck.cn, 300, 325);
+      ctx.fillStyle = "#9ca3af";
+      ctx.font = "400 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.fillText(deck.en, 300, 375);
+
+      // 标签
+      const tags = deck.tags.slice(0,3);
+      let tx = 300, ty = 410;
+      ctx.font = "500 26px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      for (const t of tags){
+        const padX = 18, padY = 10;
+        const w = ctx.measureText(t).width + padX*2;
+        ctx.fillStyle = "rgba(9,14,26,0.55)";
+        ctx.strokeStyle = "rgba(34,49,79,1)";
+        roundRect(ctx, tx, ty-28, w, 44, 22);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = "#9ca3af";
+        ctx.fillText(t, tx+padX, ty+2);
+        tx += w + 12;
+      }
+
+      // 理由（取 deck.reason + 画像一句）
+      ctx.fillStyle = "#e5e7eb";
+      ctx.font = "700 32px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.fillText("为什么适合你", 90, 500);
+      ctx.fillStyle = "#d1d5db";
+      ctx.font = "400 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      const whyText = deck.reason;
+      wrapText(ctx, whyText, 90, 550, 900, 42, 4);
+
+      // 你的画像（用当前 score）
+      ctx.fillStyle = "rgba(9,14,26,0.55)";
+      ctx.strokeStyle = "rgba(34,49,79,1)";
+      roundRect(ctx, 60, 780, 960, 360, 34);
+      ctx.fill(); ctx.stroke();
+
+      ctx.fillStyle = "#9ca3af";
+      ctx.font = "600 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.fillText("你的风格画像（0-100）", 90, 845);
+
+      ctx.fillStyle = "#e5e7eb";
+      ctx.font = "500 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      const sp = {
+        pace: Math.round(score.pace),
+        complex: Math.round(score.complex),
+        risk: Math.round(score.risk),
+        control: Math.round(score.control),
+        patience: Math.round(score.patience),
+      };
+      const lines = [
+        `行动速度  ${sp.pace}`,
+        `思考复杂度  ${sp.complex}`,
+        `冒险倾向  ${sp.risk}`,
+        `掌控倾向  ${sp.control}`,
+        `耐心/长期主义  ${sp.patience}`,
+      ];
+      let yy = 905;
+      for (const l of lines){
+        ctx.fillText(l, 90, yy);
+        yy += 52;
+      }
+
+      // 署名
+      ctx.fillStyle = "#9ca3af";
+      ctx.font = "400 28px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
+      ctx.fillText("by 牛油果", 90, 1240);
+      ctx.fillText("数据：Limitless（BRS–SSP）", 90, 1290);
+
+      shareDataUrl = canvas.toDataURL("image/png");
+      $("sharePreview").src = shareDataUrl;
+      $("sharePreviewWrap").classList.remove("hidden");
+      $("btnDownloadShare").disabled = false;
+
+      // Web Share（支持则启用）
+      if (navigator.canShare && navigator.canShare({ files: [new File([], "x.png")] })){
+        $("btnShareSystem").disabled = false;
+      } else if (navigator.share){
+        // 某些浏览器只有 share，无 canShare(files)；仍尝试启用
+        $("btnShareSystem").disabled = false;
+      }
+    }
+
+    function dataUrlToBlob(dataUrl){
+      const parts = dataUrl.split(",");
+      const mime = parts[0].match(/:(.*?);/)[1];
+      const bstr = atob(parts[1]);
+      let n = bstr.length;
+      const u8 = new Uint8Array(n);
+      while(n--) u8[n] = bstr.charCodeAt(n);
+      return new Blob([u8], { type: mime });
+    }
+
+    function renderDeck(deck, isBest){
+      const url = `https://limitlesstcg.com/decks/${deck.id}`;
+      const tags = deck.tags.map(t => `<span class="tag">${t}</span>`).join("");
+      const iconUrl = `https://r2.limitlesstcg.net/pokemon/gen9/${deck.icon}.png`;
+
+      const why = buildWhy(deck);
+      return `
+        <div class="deckhero">
+          <img class="deckimg ${isBest ? "" : "small"}" src="${iconUrl}" alt="${deck.en}" loading="lazy" />
+          <div>
+            <div class="deckname">
+              <div class="cn">${isBest ? "✅ " : ""}${deck.cn}</div>
+              <div class="en">(${deck.en})</div>
+            </div>
+            <div class="small" style="margin-top:6px">${tags}</div>
+            <div class="small" style="margin-top:8px">
+              Limitless 链接：<a href="${url}" target="_blank" rel="noreferrer">${url}</a>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-weight:700">为什么适合你</div>
+        <ul class="why">${why}</ul>
+        <div class="small" style="margin-top:10px">
+          性格画像：行动速度 ${deck.vec.pace} / 思考复杂度 ${deck.vec.complex} / 冒险 ${deck.vec.risk} / 掌控 ${deck.vec.control} / 耐心 ${deck.vec.patience}
+        </div>
+      `;
+    }
+
+    function buildWhy(deck){
+      // 用“你”的分数对齐 deck 的特点，给出自然语言理由（原型：规则可改）
+      const lines = [];
+      const s = score;
+      if (deck.vec.pace >= 70){
+        lines.push(s.pace >= 55
+          ? "你偏向快速推进、喜欢尽快看到结果；这套属于快节奏体系，更能把你的行动力转化为优势。"
+          : "即使你不算特别急，这套也能用“速度与主动”帮你减少被动挨打的时刻。");
+      } else if (deck.vec.pace <= 35){
+        lines.push(s.patience >= 60
+          ? "你能做长线决策、愿意慢慢滚雪球；这套偏慢速/控制，越往后越能体现耐心与掌控感。"
+          : "这套节奏偏慢：更适合你把注意力放在稳定与可控上，而不是拼速度。");
+      } else {
+        lines.push("你更像均衡型：既想推进也不想莽；这套中速卡组能让你在不同对局里更灵活地切换策略。");
+      }
+
+      if (deck.vec.complex >= 80){
+        lines.push(s.complex >= 60
+          ? "你享受“多路线选择”的烧脑过程；它的线路/取舍多，强度很吃操作与对局理解。"
+          : "它的路线较多：即使你不追求极致复杂，也能通过学习逐步提升上限。");
+      } else if (deck.vec.complex <= 40){
+        lines.push("它的核心思路直观，决策负担低，更容易把注意力放在“推进与执行”上。");
+      } else {
+        lines.push("复杂度适中：有思考空间但不至于一直爆脑，适合长期上手。");
+      }
+
+      if (deck.vec.control >= 75){
+        lines.push(s.control >= 55
+          ? "你有较强的“掌控倾向”，喜欢把局面握在手里；这套的核心就是限制与拆解对手的推进。"
+          : "这套偏限制型：即使你不是典型控制型玩家，也能用它把对手的关键节点按住。");
+      } else if (deck.vec.control <= 30){
+        lines.push("它更偏正面推进与压制：用持续压力迫使对手跟着你的节奏走。");
+      } else {
+        lines.push("它兼顾对抗与推进：既能打正面也能适度干扰，对局面覆盖更广。");
+      }
+
+      // 风险偏好补一句
+      if (deck.vec.risk >= 70){
+        lines.push("它的上限高但更吃关键时机的取舍；你越敢抓窗口，上限就越容易被你打出来。");
+      } else if (deck.vec.risk <= 40){
+        lines.push("它偏稳健容错：不太依赖“搏命一把”，更适合稳扎稳打。");
+      } else {
+        lines.push("波动与稳定相对平衡：既有爆发点，也能通过运营把胜率托住。");
+      }
+
+      // 加上 deck 自带一句“定位总结”
+      lines.push(deck.reason);
+      return lines.map(x => `<li>${x}</li>`).join("");
+    }
+
+    // --- events ---
+    btnStart.addEventListener("click", start);
+    btnBack.addEventListener("click", () => { back(); });
+    btnReset.addEventListener("click", reset);
+    btnRetake.addEventListener("click", start);
+
+    $("btnMakeShare").addEventListener("click", async () => {
+      $("btnMakeShare").disabled = true;
+      $("btnMakeShare").textContent = "生成中…";
+      try{
+        await generateShareImage();
+      }finally{
+        $("btnMakeShare").disabled = false;
+        $("btnMakeShare").textContent = "生成分享图";
+      }
+    });
+
+    $("btnDownloadShare").addEventListener("click", () => {
+      if (!shareDataUrl) return;
+      const a = document.createElement("a");
+      a.href = shareDataUrl;
+      a.download = "ptcg-quiz-result.png";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    });
+
+    $("btnShareSystem").addEventListener("click", async () => {
+      if (!shareDataUrl || !navigator.share) return;
+      try{
+        const blob = dataUrlToBlob(shareDataUrl);
+        const file = new File([blob], "ptcg-quiz-result.png", { type: "image/png" });
+        await navigator.share({
+          title: "测测你的卡组",
+          text: "我测出来的卡组推荐（by 牛油果）",
+          files: [file],
+        });
+      }catch(e){
+        // 用户取消也会走到这里，不提示
+      }
+    });
+
+    // init
+    renderKpis();
+    btnBack.disabled = true;
+    // 预先做一次均衡校准（同步执行，控制在可接受耗时）
+    deckBias = calibrateDeckBias();
+  </script>
+</body>
+</html>
