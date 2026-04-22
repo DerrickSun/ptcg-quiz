@@ -232,78 +232,78 @@
         reason: "靠关键回合打出爆发与转折；适合喜欢抓时机、追求爽感的人。" },
     ];
 
-    // 12 道三选题：4 个维度 × 每个 3 题（题面不贴卡组/不贴打牌语境；内部用“性格轴”推导风格画像）
+    // 12 道三选题：4 个维度 × 每个 3 题（更像“性格测试”的生活场景题，不贴卡组/不贴打牌语境）
     const questions = [
-      // 能量题（偏外向互动 vs 偏内向独处）
-      { sec: "energy", text: "周末突然空出半天，你更想怎么过？", opts: [
-        { t: "约朋友/出门走走", axis: "ei", val: +1 },
-        { t: "看心情（都行）", axis: "ei", val: 0 },
-        { t: "宅家独处/自己充电", axis: "ei", val: -1 },
+      // 社交/独处（E/I）
+      { sec: "energy", text: "突然有半天自由时间，你更想？", opts: [
+        { t: "约人见面/出去玩", axis: "ei", val: +1 },
+        { t: "看心情再说", axis: "ei", val: 0 },
+        { t: "一个人待着充电", axis: "ei", val: -1 },
       ]},
-      { sec: "energy", text: "在一群人里，你更像哪种角色？", opts: [
-        { t: "主动聊/带节奏", axis: "ei", val: +1 },
-        { t: "看情况参与", axis: "ei", val: 0 },
-        { t: "更爱听/观察", axis: "ei", val: -1 },
+      { sec: "energy", text: "到了一个全是陌生人的聚会，你更像？", opts: [
+        { t: "主动找话题/认识人", axis: "ei", val: +1 },
+        { t: "有人来聊就聊", axis: "ei", val: 0 },
+        { t: "先观察，慢慢热", axis: "ei", val: -1 },
       ]},
-      { sec: "energy", text: "压力上来时，你更倾向先怎么处理？", opts: [
-        { t: "先找人聊聊", axis: "ei", val: +1 },
-        { t: "都可以", axis: "ei", val: 0 },
-        { t: "先自己消化", axis: "ei", val: -1 },
+      { sec: "energy", text: "你有个好消息时更可能？", opts: [
+        { t: "立刻分享给别人", axis: "ei", val: +1 },
+        { t: "挑人/挑时机", axis: "ei", val: 0 },
+        { t: "先自己开心一会", axis: "ei", val: -1 },
       ]},
 
-      // 信息题（偏细节现实 vs 偏抽象可能）
-      { sec: "observe", text: "你做事更依赖什么？", opts: [
-        { t: "经验/细节/落地", axis: "sn", val: -1 },
-        { t: "都重要", axis: "sn", val: 0 },
-        { t: "灵感/可能性/脑洞", axis: "sn", val: +1 },
+      // 细节/抽象（S/N）
+      { sec: "observe", text: "别人讲一件事，你更容易先抓到？", opts: [
+        { t: "细节和证据点", axis: "sn", val: -1 },
+        { t: "两边都会听", axis: "sn", val: 0 },
+        { t: "重点和走向", axis: "sn", val: +1 },
       ]},
-      { sec: "observe", text: "别人讲一件事，你更在意？", opts: [
-        { t: "细节/证据", axis: "sn", val: -1 },
-        { t: "都听", axis: "sn", val: 0 },
-        { t: "意义/走向", axis: "sn", val: +1 },
-      ]},
-      { sec: "observe", text: "学一个新东西，你更常用的方式是？", opts: [
-        { t: "先照着做一遍", axis: "sn", val: -1 },
-        { t: "边做边摸索", axis: "sn", val: 0 },
+      { sec: "observe", text: "学新东西你更常用？", opts: [
+        { t: "照着范例先做", axis: "sn", val: -1 },
+        { t: "边做边理解", axis: "sn", val: 0 },
         { t: "先搞懂原理", axis: "sn", val: +1 },
       ]},
-
-      // 决策题（偏理性标准 vs 偏感受关系）
-      { sec: "decide", text: "做决定时你更偏向？", opts: [
-        { t: "利弊/效率优先", axis: "tf", val: +1 },
-        { t: "综合看", axis: "tf", val: 0 },
-        { t: "感受/关系优先", axis: "tf", val: -1 },
+      { sec: "observe", text: "看到一个新点子，你更像？", opts: [
+        { t: "先问能不能落地", axis: "sn", val: -1 },
+        { t: "先存着再说", axis: "sn", val: 0 },
+        { t: "先脑补各种可能", axis: "sn", val: +1 },
       ]},
-      { sec: "decide", text: "和人有分歧时，你更常先做？", opts: [
-        { t: "先讲清逻辑", axis: "tf", val: +1 },
-        { t: "看情况", axis: "tf", val: 0 },
+
+      // 理性/共情（T/F）
+      { sec: "decide", text: "朋友来问建议，你更常先？", opts: [
+        { t: "先分析利弊", axis: "tf", val: +1 },
+        { t: "边安慰边想法", axis: "tf", val: 0 },
         { t: "先照顾情绪", axis: "tf", val: -1 },
       ]},
-      { sec: "decide", text: "你判断一件事“做得好不好”更看重？", opts: [
-        { t: "结果/质量", axis: "tf", val: +1 },
-        { t: "都看", axis: "tf", val: 0 },
-        { t: "过程/感受", axis: "tf", val: -1 },
+      { sec: "decide", text: "发生分歧时，你更在意？", opts: [
+        { t: "对不对/合不合理", axis: "tf", val: +1 },
+        { t: "都要兼顾", axis: "tf", val: 0 },
+        { t: "和不和气/舒不舒服", axis: "tf", val: -1 },
+      ]},
+      { sec: "decide", text: "评价一次“做得好”，你更偏向？", opts: [
+        { t: "结果有没有达标", axis: "tf", val: +1 },
+        { t: "结果过程都看", axis: "tf", val: 0 },
+        { t: "过程体验好不好", axis: "tf", val: -1 },
       ]},
 
-      // 节奏题（偏计划掌控 vs 偏弹性应变）
-      { sec: "life", text: "临近出门，你更像？", opts: [
-        { t: "提前准备好", axis: "jp", val: +1 },
-        { t: "随便", axis: "jp", val: 0 },
-        { t: "到点就走", axis: "jp", val: -1 },
+      // 计划/随性（J/P）
+      { sec: "life", text: "出门/旅行你更像？", opts: [
+        { t: "先把计划排好", axis: "jp", val: +1 },
+        { t: "有个大概就行", axis: "jp", val: 0 },
+        { t: "到了再随机应变", axis: "jp", val: -1 },
       ]},
-      { sec: "life", text: "你的待办清单更像？", opts: [
-        { t: "写得很细", axis: "jp", val: +1 },
-        { t: "偶尔写", axis: "jp", val: 0 },
-        { t: "基本不写", axis: "jp", val: -1 },
+      { sec: "life", text: "遇到截止时间，你更常？", opts: [
+        { t: "提前搞定更安心", axis: "jp", val: +1 },
+        { t: "按节奏稳稳做完", axis: "jp", val: 0 },
+        { t: "临近才会爆发", axis: "jp", val: -1 },
       ]},
-      { sec: "life", text: "计划被打乱时，你更像？", opts: [
-        { t: "先重排到可控", axis: "jp", val: +1 },
-        { t: "都可以", axis: "jp", val: 0 },
-        { t: "走着看再说", axis: "jp", val: -1 },
+      { sec: "life", text: "计划被打乱时你更像？", opts: [
+        { t: "立刻重排到可控", axis: "jp", val: +1 },
+        { t: "先稳住再调整", axis: "jp", val: 0 },
+        { t: "顺势改就行", axis: "jp", val: -1 },
       ]},
     ];
 
-    const sectionNames = { energy: "能量题", observe: "信息题", decide: "决策题", life: "节奏题" };
+    const sectionNames = { energy: "社交", observe: "思维", decide: "选择", life: "习惯" };
     function sectionProgress(i){
       const sec = questions[i]?.sec ?? "energy";
       let total = 0, before = 0;
