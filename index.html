@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>测测你的卡组</title>
+  <title>测测你该玩哪套</title>
   <style>
     :root{
       /* 手游活动页：清爽浅色 */
@@ -36,6 +36,14 @@
     .topbar{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
     .title h1{font-size:22px;margin:0 0 6px}
     .title p{margin:0;color:var(--muted);line-height:1.4}
+    .intro{
+      margin-top:12px;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:14px;
+      background:rgba(255,255,255,.72);
+    }
+    .intro .lead{font-size:14px;color:var(--muted);line-height:1.5}
     .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(243,246,255,.9);color:var(--muted);font-size:12px}
     .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
     @media (max-width: 900px){.grid{grid-template-columns:1fr}}
@@ -56,10 +64,12 @@
     /* 中间选项降低一点存在感，鼓励选左右（仍保持可点、可读） */
     button.opt.neutral{opacity:.84}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .qhead .row{justify-content:flex-end;gap:8px}
     .btn{
       cursor:pointer;border-radius:12px;border:1px solid var(--border);
       padding:10px 12px;background:rgba(255,255,255,.85);color:var(--text)
     }
+    .btn.big{padding:14px 16px;border-radius:14px;font-size:16px}
     .btn:hover{border-color:#93c5fd}
     .btn.primary{border-color:rgba(37,99,235,.55);background:rgba(37,99,235,.10)}
     .btn.danger{border-color:rgba(225,29,72,.35);background:rgba(225,29,72,.08)}
@@ -96,8 +106,8 @@
     .modal{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);display:none}
     .modal.show{display:block}
     .modal-inner{max-width:980px;margin:0 auto;padding:16px;height:100%;display:flex;flex-direction:column}
-    .modal-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
-    .modal-top .hint{color:var(--muted);font-size:12px;line-height:1.4}
+    .modal-top{display:flex;align-items:center;justify-content:center;gap:10px}
+    .modal-top .hint{color:#fff;font-size:12px;line-height:1.4}
     .modal-body{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 0}
     .modal-img{max-width:100%;max-height:100%;border-radius:14px;border:1px solid var(--border);background:#fff}
 
@@ -106,6 +116,7 @@
       body{font-size:17px}
       .title h1{font-size:20px}
       .title p{font-size:14px}
+      .intro .lead{font-size:15px}
       .qtext{font-size:18px}
       .qnum{font-size:13px}
       button.opt{padding:12px 12px}
@@ -114,6 +125,7 @@
       .deckimg{width:72px;height:72px;flex-basis:72px}
       .deckimg.small{width:52px;height:52px;flex-basis:52px}
       .small{font-size:13px}
+      .btn.big{padding:16px 16px;font-size:17px}
     }
   </style>
 </head>
@@ -121,10 +133,8 @@
   <div class="wrap">
     <div class="topbar">
       <div class="title">
-        <h1>测测你的卡组</h1>
-        <p>16道题，生成你的「风格画像」，再分配一套适合你的标准赛制卡组（BRS–SSP，参考 Limitless 全时期积分榜前列卡组）。</p>
+        <h1>测测你该玩哪套</h1>
       </div>
-      <div class="pill" id="formatPill">数据源：Limitless（BRS–SSP）</div>
     </div>
     <div class="author">by 牛油果</div>
 
@@ -139,9 +149,15 @@
           </div>
         </div>
         <div id="quiz">
-          <div class="qtext" id="qtext">点击「开始测试」进入题目。</div>
-          <div class="row">
-            <button class="btn primary" id="btnStart" type="button">开始测试</button>
+          <div class="intro">
+            <div class="lead">
+              16道题（每题三选一），测出你的「风格画像」。<br/>
+              然后从当前热门体系里，匹配一套更适合你的标准赛制卡组（BRS–SSP）。<br/>
+              测完可一键生成结果图，微信里长按保存/转发。
+            </div>
+            <div class="row" style="margin-top:12px">
+              <button class="btn primary big" id="btnStart" type="button">开始测试</button>
+            </div>
           </div>
         </div>
 
@@ -149,19 +165,19 @@
           <div class="result-title">
             <h2>你的推荐卡组</h2>
             <div class="row">
+              <button class="btn" id="btnSaveTop" type="button">保存图片</button>
               <button class="btn primary" id="btnRetake" type="button">再测一次</button>
             </div>
           </div>
           <div class="deckcard" id="bestCard"></div>
           <div class="deckcard">
             <div style="font-weight:700;margin-bottom:8px;">分享</div>
-            <div class="small">
-              生成一张结果图（适合手机发群/发朋友圈）。<b>微信内打开</b>时通常不支持“系统分享”，推荐：<b>点“打开大图” → 长按图片 → 保存/转发</b>。
-              如果图里宝可梦头像加载失败，会自动用纯文字版。
-            </div>
             <div class="sharebox">
-              <button class="btn primary" id="btnOpenShare" type="button">打开大图</button>
+              <button class="btn primary" id="btnOpenShare" type="button">保存图片</button>
               <button class="btn" id="btnMakeShare" type="button">重新生成</button>
+            </div>
+            <div class="small" style="margin-top:10px">
+              微信内打开：点「保存图片」→ 弹出大图 → <b>长按图片</b>保存/转发（点图片可关闭）。
             </div>
             <div class="sharepreview hidden" id="sharePreviewWrap">
               <img id="sharePreview" alt="分享图预览" />
@@ -169,8 +185,7 @@
             <div class="modal" id="shareModal" role="dialog" aria-modal="true" aria-label="分享图大图">
               <div class="modal-inner">
                 <div class="modal-top">
-                  <div class="hint">提示：在微信里可以长按图片 → 保存/转发</div>
-                  <button class="btn" id="btnCloseModal" type="button">关闭</button>
+                  <div class="hint">长按图片 → 保存/转发（点图片关闭）</div>
                 </div>
                 <div class="modal-body">
                   <img class="modal-img" id="shareModalImg" alt="分享图大图" />
@@ -183,7 +198,7 @@
             <div class="alts" id="alts"></div>
           </div>
           <div class="footer-note">
-            这是一个可快速校验逻辑的原型：<b>中文译名、题目倾向、卡组标签都可以你来改</b>。你看完后告诉我：哪些译名要换、哪些卡组更应该“快攻/控制/复杂”，我再按你的口径精修。
+            提示：结果是“性格画像→卡组匹配”的推荐，不是强度排名；不满意可「再测一次」。
           </div>
         </div>
       </div>
@@ -371,7 +386,6 @@
     const $ = (id) => document.getElementById(id);
     const bar = $("bar");
     const qnum = $("qnum");
-    const qtext = $("qtext");
     const quiz = $("quiz");
     const result = $("result");
     const kpis = $("kpis");
@@ -382,7 +396,6 @@
     const btnReset2 = $("btnRetake");
     const shareModal = $("shareModal");
     const shareModalImg = $("shareModalImg");
-    const btnCloseModal = $("btnCloseModal");
 
     function initScore(){
       const s = {};
@@ -466,7 +479,6 @@
       const q = questions[idx];
       const sp = sectionProgress(idx);
       qnum.textContent = `${sp.secName} ${sp.pos}/${sp.total} · 第 ${idx+1}/${total} 题`;
-      qtext.textContent = q.text;
       bar.style.width = `${Math.round(((idx) / total) * 100)}%`;
 
       // options
@@ -477,10 +489,6 @@
       });
       html += `</div>`;
       quiz.innerHTML = `<div class="qtext" id="qtext">${q.text}</div>${html}`;
-
-      // rebind qtext ref (replaced)
-      const qtext2 = quiz.querySelector("#qtext");
-      qtext2 && (qtext2.id = "qtext"); // keep id stable
 
       quiz.querySelectorAll("button.opt").forEach(btn => {
         btn.addEventListener("click", () => {
@@ -501,6 +509,7 @@
       result.classList.add("hidden");
       quiz.classList.remove("hidden");
       recalcScoreFromAnswers();
+      updateNavUI();
       renderQuestion();
     }
 
@@ -512,10 +521,17 @@
       bar.style.width = "0%";
       result.classList.add("hidden");
       quiz.classList.remove("hidden");
+      updateNavUI();
       quiz.innerHTML = `
-        <div class="qtext" id="qtext">点击「开始测试」进入题目。</div>
-        <div class="row">
-          <button class="btn primary" id="btnStart2" type="button">开始测试</button>
+        <div class="intro">
+          <div class="lead">
+            16道题（每题三选一），测出你的「风格画像」。<br/>
+            然后从当前热门体系里，匹配一套更适合你的标准赛制卡组（BRS–SSP）。<br/>
+            测完可一键生成结果图，微信里长按保存/转发。
+          </div>
+          <div class="row" style="margin-top:12px">
+            <button class="btn primary big" id="btnStart2" type="button">开始测试</button>
+          </div>
         </div>
       `;
       quiz.querySelector("#btnStart2").addEventListener("click", start);
@@ -628,6 +644,8 @@
       qnum.textContent = "完成";
       quiz.classList.add("hidden");
       result.classList.remove("hidden");
+      idx = questions.length;
+      updateNavUI();
 
       const ranked = decks
         .map((deck, i) => ({
@@ -655,6 +673,12 @@
       // reset share UI
       shareDataUrl = null;
       $("sharePreviewWrap").classList.add("hidden");
+    }
+
+    function updateNavUI(){
+      const show = (idx >= 0 && idx < questions.length);
+      btnBack.classList.toggle("hidden", !show);
+      btnReset.classList.toggle("hidden", !show);
     }
 
 
@@ -788,7 +812,7 @@
       // 标题
       ctx.fillStyle = "#0f172a";
       ctx.font = "700 52px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
-      ctx.fillText("测测你的卡组", 70, 120);
+      ctx.fillText("测测你该玩哪套", 70, 120);
       ctx.fillStyle = "#475569";
       ctx.font = "400 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       ctx.fillText("你的推荐卡组", 70, 170);
@@ -1033,10 +1057,15 @@
       })();
     });
 
-    btnCloseModal && btnCloseModal.addEventListener("click", closeShareModal);
+    // 结果页顶部的“保存图片”= 同一个动作
+    $("btnSaveTop").addEventListener("click", () => {
+      $("btnOpenShare").click();
+    });
+
     shareModal && shareModal.addEventListener("click", (e) => {
       if (e.target === shareModal) closeShareModal();
     });
+    shareModalImg && shareModalImg.addEventListener("click", closeShareModal);
 
     // init
     clampDeckVecs();
