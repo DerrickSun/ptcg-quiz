@@ -22,6 +22,7 @@
     body{
       margin:0;
       font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+      font-size:16px;
       color:var(--text);
       background:
         radial-gradient(900px 520px at 18% 8%, rgba(37,99,235,.18) 0%, rgba(37,99,235,0) 55%),
@@ -102,13 +103,17 @@
 
     @media (max-width: 520px){
       .wrap{padding:18px 12px 42px}
-      .title h1{font-size:18px}
-      .qtext{font-size:16px}
+      body{font-size:17px}
+      .title h1{font-size:20px}
+      .title p{font-size:14px}
+      .qtext{font-size:18px}
+      .qnum{font-size:13px}
       button.opt{padding:12px 12px}
+      button.opt{font-size:16px}
       .deckhero{gap:10px}
       .deckimg{width:72px;height:72px;flex-basis:72px}
       .deckimg.small{width:52px;height:52px;flex-basis:52px}
-      .kpi{grid-template-columns:1fr}
+      .small{font-size:13px}
     }
   </style>
 </head>
@@ -658,16 +663,63 @@
     let shareDataUrl = null;
     let shareBlobUrl = null;
 
-    async function loadImageAsBitmap(url){
-      // 尝试用 fetch 把图片转 blob 再画到 canvas，尽量规避跨域污染
+    async function loadImageForCanvas(url){
+      // 微信内置浏览器/部分 iOS 对 createImageBitmap 支持不稳定：这里做多级兜底
+      // 返回可直接 ctx.drawImage 的对象：ImageBitmap 或 HTMLImageElement
+      // 1) fetch -> blob -> createImageBitmap（优先）
+      // 2) fetch -> blob -> <img> 解码（兜底）
+      // 3) 直接 <img src=url>（最后兜底）
+      const canCreateBitmap = typeof createImageBitmap === "function";
       try{
-        const res = await fetch(url, { mode: "cors" });
+        const res = await fetch(url, { cache: "force-cache" });
         if (!res.ok) throw new Error("fetch failed");
         const blob = await res.blob();
-        const bmp = await createImageBitmap(blob);
-        return bmp;
+        if (canCreateBitmap){
+          try{
+            return await createImageBitmap(blob);
+          }catch(e){
+            // fallthrough
+          }
+        }
+        // img from blob
+        const blobUrl = URL.createObjectURL(blob);
+        try{
+          const img = new Image();
+          img.decoding = "async";
+          img.src = blobUrl;
+          // decode() 在某些环境更稳；不支持则走 onload
+          if (img.decode){
+            await img.decode();
+          }else{
+            await new Promise((resolve, reject) => {
+              img.onload = () => resolve();
+              img.onerror = () => reject(new Error("img load failed"));
+            });
+          }
+          return img;
+        }finally{
+          // 注意：img 可能还在使用 blobUrl，但现代浏览器会缓存解码后的数据；
+          // 为稳妥起见，延迟一点再 revoke
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
+        }
       }catch(e){
-        return null;
+        try{
+          const img = new Image();
+          img.crossOrigin = "anonymous";
+          img.decoding = "async";
+          img.src = url;
+          if (img.decode){
+            await img.decode();
+          }else{
+            await new Promise((resolve, reject) => {
+              img.onload = () => resolve();
+              img.onerror = () => reject(new Error("img load failed"));
+            });
+          }
+          return img;
+        }catch(e2){
+          return null;
+        }
       }
     }
 
@@ -706,7 +758,7 @@
     async function generateShareImage(){
       if (!lastResult) return;
       const deck = lastResult.best;
-      const iconUrl = `https://r2.limitlesstcg.net/pokemon/gen9/${deck.icon}.png`;
+      const iconUrl = `./assets/pokemon_icons/${deck.icon}.png`;
 
       const W = 1080, H = 1350;
       const canvas = document.createElement("canvas");
@@ -750,13 +802,15 @@
       ctx.stroke();
 
       // 宝可梦头像（可选）
-      const bmp = await loadImageAsBitmap(iconUrl);
+      const bmp = await loadImageForCanvas(iconUrl);
       if (bmp){
         // 头像底
         ctx.fillStyle = "rgba(37,99,235,0.06)";
         roundRect(ctx, 90, 260, 180, 180, 34);
         ctx.fill();
         ctx.drawImage(bmp, 110, 280, 140, 140);
+      }else{
+        // 兜底：不画头像也能正常生成
       }
 
       // 卡组名
@@ -854,7 +908,7 @@
     }
 
     function openShareModal(){
-      const url = shareDataUrl;
+      const url = shareBlobUrl || shareDataUrl;
       if (!url) return;
       shareModalImg.src = url;
       shareModal.classList.add("show");
@@ -867,7 +921,8 @@
     function renderDeck(deck, isBest){
       const url = `https://limitlesstcg.com/decks/${deck.id}`;
       const tags = deck.tags.map(t => `<span class="tag">${t}</span>`).join("");
-      const iconUrl = `https://r2.limitlesstcg.net/pokemon/gen9/${deck.icon}.png`;
+      // 使用本地静态资源：微信内打开/分享图生成更稳定
+      const iconUrl = `./assets/pokemon_icons/${deck.icon}.png`;
 
       const why = buildWhy(deck);
       return `
