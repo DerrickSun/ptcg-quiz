@@ -6,22 +6,40 @@
   <title>测测你的卡组</title>
   <style>
     :root{
-      --bg:#0b1220;--card:#111a2e;--card2:#0f172a;--text:#e5e7eb;--muted:#9ca3af;
-      --accent:#60a5fa;--accent2:#34d399;--danger:#fb7185;--border:#22314f;
+      /* 手游活动页：清爽浅色 */
+      --bg:#f6f8ff;
+      --card:#ffffff;
+      --card2:#f3f6ff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --accent:#2563eb;
+      --accent2:#06b6d4;
+      --danger:#e11d48;
+      --border:#dbe3ff;
+      --shadow: 0 10px 30px rgba(15,23,42,.10);
     }
     *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(1200px 700px at 30% 10%, #13264d 0%, var(--bg) 55%);color:var(--text)}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 520px at 18% 8%, rgba(37,99,235,.18) 0%, rgba(37,99,235,0) 55%),
+        radial-gradient(800px 520px at 88% 22%, rgba(6,182,212,.14) 0%, rgba(6,182,212,0) 55%),
+        radial-gradient(900px 620px at 40% 92%, rgba(99,102,241,.10) 0%, rgba(99,102,241,0) 55%),
+        linear-gradient(180deg, #ffffff, var(--bg));
+    }
     a{color:var(--accent);text-decoration:none}
     a:hover{text-decoration:underline}
     .wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
     .topbar{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
     .title h1{font-size:22px;margin:0 0 6px}
     .title p{margin:0;color:var(--muted);line-height:1.4}
-    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(17,26,46,.65);color:var(--muted);font-size:12px}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(243,246,255,.9);color:var(--muted);font-size:12px}
     .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
     @media (max-width: 900px){.grid{grid-template-columns:1fr}}
-    .card{background:linear-gradient(180deg, rgba(17,26,46,.92), rgba(15,23,42,.92));border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.28)}
-    .progress{height:10px;background:#0a0f1c;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.96), rgba(243,246,255,.96));border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:var(--shadow)}
+    .progress{height:10px;background:#eaf0ff;border:1px solid var(--border);border-radius:999px;overflow:hidden}
     .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s ease}
     .qhead{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px}
     .qnum{color:var(--muted);font-size:12px}
@@ -29,48 +47,58 @@
     .opts{display:grid;gap:10px}
     button.opt{
       text-align:left;cursor:pointer;border-radius:14px;border:1px solid var(--border);
-      padding:12px 14px;background:rgba(9,14,26,.6);color:var(--text);line-height:1.35;
+      padding:12px 14px;background:rgba(255,255,255,.85);color:var(--text);line-height:1.35;
       transition:transform .05s ease, border-color .2s ease, background .2s ease;
     }
-    button.opt:hover{border-color:#315a98;background:rgba(12,18,34,.85)}
+    button.opt:hover{border-color:#93c5fd;background:rgba(243,246,255,.95)}
     button.opt:active{transform:translateY(1px)}
+    /* 中间选项降低一点存在感，鼓励选左右（仍保持可点、可读） */
+    button.opt.neutral{opacity:.84}
     .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
     .btn{
       cursor:pointer;border-radius:12px;border:1px solid var(--border);
-      padding:10px 12px;background:rgba(9,14,26,.6);color:var(--text)
+      padding:10px 12px;background:rgba(255,255,255,.85);color:var(--text)
     }
-    .btn:hover{border-color:#315a98}
-    .btn.primary{border-color:#2a67c7;background:rgba(33,95,196,.25)}
-    .btn.danger{border-color:#7f2334;background:rgba(251,113,133,.12)}
+    .btn:hover{border-color:#93c5fd}
+    .btn.primary{border-color:rgba(37,99,235,.55);background:rgba(37,99,235,.10)}
+    .btn.danger{border-color:rgba(225,29,72,.35);background:rgba(225,29,72,.08)}
     .small{font-size:12px;color:var(--muted);line-height:1.5}
     .hidden{display:none !important}
     .kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
     .kpi .box{border:1px solid var(--border);border-radius:14px;padding:10px;background:rgba(9,14,26,.45)}
     .kpi .label{color:var(--muted);font-size:12px}
     .kpi .val{font-size:14px;margin-top:3px}
-    .tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(9,14,26,.5);font-size:12px;color:var(--muted);margin-right:6px;margin-top:6px}
+    .tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(243,246,255,.9);font-size:12px;color:var(--muted);margin-right:6px;margin-top:6px}
     .result-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
     .result-title h2{margin:0;font-size:20px}
-    .deckcard{margin-top:14px;border:1px solid var(--border);border-radius:16px;padding:14px;background:rgba(9,14,26,.45)}
+    .deckcard{margin-top:14px;border:1px solid var(--border);border-radius:16px;padding:14px;background:rgba(243,246,255,.72)}
     .deckname{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
     .deckname .cn{font-weight:700}
     .deckname .en{color:var(--muted)}
     .deckhero{display:flex;gap:12px;align-items:center}
     .deckimg{
       width:84px;height:84px;flex:0 0 84px;border-radius:14px;
-      border:1px solid var(--border);background:rgba(255,255,255,.04);
+      border:1px solid var(--border);background:rgba(255,255,255,.9);
       padding:10px;object-fit:contain;
     }
     .deckimg.small{width:56px;height:56px;flex-basis:56px;padding:8px;border-radius:12px}
     .why{margin:10px 0 0;padding-left:18px;color:var(--text);line-height:1.55}
     .why li{margin:6px 0}
     .alts{display:grid;gap:10px;margin-top:12px}
-    .alts .alt{border:1px solid var(--border);border-radius:14px;padding:12px;background:rgba(9,14,26,.35)}
-    .footer-note{margin-top:14px;padding:10px 12px;border-radius:12px;border:1px dashed #35527b;color:var(--muted);background:rgba(9,14,26,.25);line-height:1.55}
+    .alts .alt{border:1px solid var(--border);border-radius:14px;padding:12px;background:rgba(243,246,255,.55)}
+    .footer-note{margin-top:14px;padding:10px 12px;border-radius:12px;border:1px dashed rgba(37,99,235,.45);color:var(--muted);background:rgba(255,255,255,.65);line-height:1.55}
     .author{margin-top:10px;color:var(--muted);font-size:12px;text-align:right}
     .sharebox{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
-    .sharepreview{margin-top:10px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:rgba(9,14,26,.35)}
+    .sharepreview{margin-top:10px;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:rgba(255,255,255,.7)}
     .sharepreview img{display:block;width:100%;height:auto}
+    /* 微信内打开更稳：用弹层展示大图，方便长按保存/转发 */
+    .modal{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.55);backdrop-filter:blur(6px);display:none}
+    .modal.show{display:block}
+    .modal-inner{max-width:980px;margin:0 auto;padding:16px;height:100%;display:flex;flex-direction:column}
+    .modal-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+    .modal-top .hint{color:var(--muted);font-size:12px;line-height:1.4}
+    .modal-body{flex:1;display:flex;align-items:center;justify-content:center;padding:12px 0}
+    .modal-img{max-width:100%;max-height:100%;border-radius:14px;border:1px solid var(--border);background:#fff}
 
     @media (max-width: 520px){
       .wrap{padding:18px 12px 42px}
@@ -89,7 +117,7 @@
     <div class="topbar">
       <div class="title">
         <h1>测测你的卡组</h1>
-        <p>12道题，生成你的「风格画像」，再分配一套适合你的标准赛制卡组（BRS–SSP，参考 Limitless 全时期积分榜前列卡组）。</p>
+        <p>16道题，生成你的「风格画像」，再分配一套适合你的标准赛制卡组（BRS–SSP，参考 Limitless 全时期积分榜前列卡组）。</p>
       </div>
       <div class="pill" id="formatPill">数据源：Limitless（BRS–SSP）</div>
     </div>
@@ -122,14 +150,27 @@
           <div class="deckcard" id="bestCard"></div>
           <div class="deckcard">
             <div style="font-weight:700;margin-bottom:8px;">分享</div>
-            <div class="small">生成一张结果图（适合手机发群/发朋友圈）。如果图里宝可梦头像加载失败，会自动用纯文字版。</div>
+            <div class="small">
+              生成一张结果图（适合手机发群/发朋友圈）。<b>微信内打开</b>时通常不支持“系统分享”，推荐：<b>点“打开大图” → 长按图片 → 保存/转发</b>。
+              如果图里宝可梦头像加载失败，会自动用纯文字版。
+            </div>
             <div class="sharebox">
-              <button class="btn primary" id="btnMakeShare" type="button">生成分享图</button>
-              <button class="btn" id="btnDownloadShare" type="button" disabled>下载PNG</button>
-              <button class="btn" id="btnShareSystem" type="button" disabled>系统分享</button>
+              <button class="btn primary" id="btnOpenShare" type="button">打开大图</button>
+              <button class="btn" id="btnMakeShare" type="button">重新生成</button>
             </div>
             <div class="sharepreview hidden" id="sharePreviewWrap">
               <img id="sharePreview" alt="分享图预览" />
+            </div>
+            <div class="modal" id="shareModal" role="dialog" aria-modal="true" aria-label="分享图大图">
+              <div class="modal-inner">
+                <div class="modal-top">
+                  <div class="hint">提示：在微信里可以长按图片 → 保存/转发</div>
+                  <button class="btn" id="btnCloseModal" type="button">关闭</button>
+                </div>
+                <div class="modal-body">
+                  <img class="modal-img" id="shareModalImg" alt="分享图大图" />
+                </div>
+              </div>
             </div>
           </div>
           <div class="deckcard">
@@ -142,33 +183,19 @@
         </div>
       </div>
 
-      <div class="card">
-        <div style="font-weight:700">你的性格维度（实时）</div>
-        <div class="small">每题三选一（偏左 / 中间 / 偏右）。系统会生成你的“风格画像”，再匹配更适合你的卡组（并做均衡，让各卡组出现概率更平均）。</div>
-        <div class="kpi" id="kpis"></div>
-        <div style="margin-top:12px;font-weight:700">维度解释</div>
-        <div class="small" style="margin-top:6px">
-          <div><b>行动速度</b>：越高越“先做再说”，喜欢快速推进。</div>
-          <div><b>思考复杂度</b>：越高越爱规划/推演，享受多方案与细节。</div>
-          <div><b>冒险倾向</b>：越高越敢赌一把，用波动换取上限。</div>
-          <div><b>掌控倾向</b>：越高越想掌控局面（规则/限制/把变量握在手里）。</div>
-          <div><b>耐心/长期主义</b>：越高越能做长线决策，愿意慢慢滚雪球。</div>
-        </div>
-        <div style="margin-top:12px" class="small">
-          数据链接：<a href="https://limitlesstcg.com/decks?time=all&type=all&format=BRS-SSP&region=all&division=all" target="_blank" rel="noreferrer">Limitless Decks（BRS–SSP）</a>
-        </div>
-      </div>
+      <!-- 轻量版：去掉实时维度面板，把“训练家风格”集中放在结果页与分享图 -->
+      <div id="kpis" class="hidden"></div>
     </div>
   </div>
 
   <script>
     // 维度：0-100
     const dims = [
-      { key: "pace", name: "行动速度", low: "慢热", high: "快节奏" },
-      { key: "complex", name: "思考复杂度", low: "直觉派", high: "策略派" },
-      { key: "risk", name: "冒险倾向", low: "求稳", high: "敢赌" },
-      { key: "control", name: "掌控倾向", low: "随性", high: "强掌控" },
-      { key: "patience", name: "耐心/长期主义", low: "短线", high: "长线" },
+      { key: "pace", name: "出手速度", low: "慢热", high: "神速" },
+      { key: "complex", name: "线路感", low: "直来直去", high: "套路王" },
+      { key: "risk", name: "搏命值", low: "稳健", high: "敢梭哈" },
+      { key: "control", name: "控场欲", low: "硬碰硬", high: "爱控场" },
+      { key: "patience", name: "续航力", low: "短线", high: "耐久战" },
     ];
 
     // Limitless（BRS–SSP，time=all）——原型：中文译名与标签可后续按你口径校验/调整
@@ -207,13 +234,14 @@
         vec: { pace: 60, complex: 75, risk: 65, control: 35, patience: 55 },
         reason: "靠资源转换打爆发，手牌与资源管理关键；适合喜欢“算牌/算线”的人。" },
       { id: 227, en: "Palkia VSTAR", cn: "帕路奇亚VSTAR", icon: "palkia", tags: ["中速","稳定","场面控制"],
-        vec: { pace: 60, complex: 55, risk: 45, control: 45, patience: 55 },
-        reason: "稳定中速：既能快速进入战斗，也能做场面运营；适合均衡型玩家。" },
+        vec: { pace: 55, complex: 50, risk: 35, control: 60, patience: 65 },
+        reason: "更偏稳健控场：节奏不快但很扎实，重视场面与资源的可控性。" },
       { id: 268, en: "Roaring Moon ex", cn: "轰鸣月ex", icon: "roaring-moon", tags: ["快攻","高压","换血取胜"],
         vec: { pace: 85, complex: 55, risk: 75, control: 30, patience: 30 },
         reason: "用高压节奏逼对手失误，但也更吃取舍；适合敢换血、追求压制的人。" },
       { id: 241, en: "Lost Zone Box", cn: "LTB", icon: "comfey", tags: ["超高操作","多分支","节奏"],
-        vec: { pace: 75, complex: 95, risk: 60, control: 55, patience: 65 },
+        // 注意：题目映射的“思考复杂度”上限大约在 80 左右，过高会导致命中次数≈0
+        vec: { pace: 75, complex: 80, risk: 60, control: 55, patience: 65 },
         reason: "选择题很多：每回合都在做路线决策；适合享受高强度思考与微操的人。" },
       { id: 276, en: "Pidgeot Control", cn: "大比鸟控制", icon: "pidgeot", tags: ["控制","针对性强","读牌"],
         vec: { pace: 25, complex: 85, risk: 40, control: 90, patience: 85 },
@@ -221,85 +249,100 @@
       { id: 283, en: "Iron Thorns ex", cn: "铁荆棘ex", icon: "iron-thorns", tags: ["干扰","半控制","反展开"],
         vec: { pace: 45, complex: 60, risk: 45, control: 75, patience: 65 },
         reason: "通过干扰破坏对手展开；适合喜欢对抗、爱找对手别扭但又不想极端长局的人。" },
-      { id: 273, en: "Ancient Box", cn: "古代box", icon: "koraidon", tags: ["节奏","稳中带爆发","单奖/多奖混"],
-        vec: { pace: 70, complex: 70, risk: 60, control: 40, patience: 55 },
-        reason: "节奏与运营并存：既要压节奏也要管资源；适合“能快也能稳”的人。" },
       { id: 257, en: "Miraidon ex", cn: "密勒顿ex", icon: "miraidon", tags: ["快攻","展开简单","打点直接"],
         vec: { pace: 85, complex: 35, risk: 55, control: 25, patience: 25 },
         reason: "展开直观，主打速度与打点；适合喜欢干脆利落、不想纠结太多的人。" },
-      { id: 299, en: "Ceruledge ex", cn: "苍炎刃鬼ex", icon: "ceruledge", tags: ["进攻","节奏","爆发回合"],
-        vec: { pace: 75, complex: 55, risk: 65, control: 30, patience: 40 },
-        reason: "靠关键回合打出爆发与转折；适合喜欢抓时机、追求爽感的人。" },
     ];
 
-    // 12 道三选题：4 个维度 × 每个 3 题（更像“性格测试”的生活场景题，不贴卡组/不贴打牌语境）
+    // 16 道三选题：4 个维度 × 每个 4 题（更像“性格测试”的生活场景题，不贴卡组/不贴打牌语境）
+    // 中间项为了减少“全部选中间”的情况，会带轻微倾向（±0.25）；展示仍为整数。
     const questions = [
       // 社交/独处（E/I）
       { sec: "energy", text: "突然有半天自由时间，你更想？", opts: [
         { t: "约人见面/出去玩", axis: "ei", val: +1 },
-        { t: "看心情再说", axis: "ei", val: 0 },
+        { t: "说不清（偏出门）", axis: "ei", val: +0.25 },
         { t: "一个人待着充电", axis: "ei", val: -1 },
       ]},
       { sec: "energy", text: "到了一个全是陌生人的聚会，你更像？", opts: [
         { t: "主动找话题/认识人", axis: "ei", val: +1 },
-        { t: "有人来聊就聊", axis: "ei", val: 0 },
+        { t: "看情况（偏观察）", axis: "ei", val: -0.25 },
         { t: "先观察，慢慢热", axis: "ei", val: -1 },
       ]},
       { sec: "energy", text: "你有个好消息时更可能？", opts: [
         { t: "立刻分享给别人", axis: "ei", val: +1 },
-        { t: "挑人/挑时机", axis: "ei", val: 0 },
+        { t: "不太确定（偏分享）", axis: "ei", val: +0.25 },
         { t: "先自己开心一会", axis: "ei", val: -1 },
+      ]},
+      { sec: "energy", text: "一天结束后你更想？", opts: [
+        { t: "再约点活动/聊聊天", axis: "ei", val: +1 },
+        { t: "随便（偏外放）", axis: "ei", val: +0.25 },
+        { t: "安静独处/刷点自己的", axis: "ei", val: -1 },
       ]},
 
       // 细节/抽象（S/N）
       { sec: "observe", text: "别人讲一件事，你更容易先抓到？", opts: [
         { t: "细节和证据点", axis: "sn", val: -1 },
-        { t: "两边都会听", axis: "sn", val: 0 },
+        { t: "说不准（偏重点）", axis: "sn", val: +0.25 },
         { t: "重点和走向", axis: "sn", val: +1 },
       ]},
       { sec: "observe", text: "学新东西你更常用？", opts: [
         { t: "照着范例先做", axis: "sn", val: -1 },
-        { t: "边做边理解", axis: "sn", val: 0 },
+        { t: "随便试试（偏照做）", axis: "sn", val: -0.25 },
         { t: "先搞懂原理", axis: "sn", val: +1 },
       ]},
       { sec: "observe", text: "看到一个新点子，你更像？", opts: [
         { t: "先问能不能落地", axis: "sn", val: -1 },
-        { t: "先存着再说", axis: "sn", val: 0 },
+        { t: "先放一边（偏落地）", axis: "sn", val: -0.25 },
         { t: "先脑补各种可能", axis: "sn", val: +1 },
+      ]},
+      { sec: "observe", text: "你更容易被哪种内容吸引？", opts: [
+        { t: "能马上用的", axis: "sn", val: -1 },
+        { t: "都行（偏脑洞）", axis: "sn", val: +0.25 },
+        { t: "能启发想象的", axis: "sn", val: +1 },
       ]},
 
       // 理性/共情（T/F）
       { sec: "decide", text: "朋友来问建议，你更常先？", opts: [
         { t: "先分析利弊", axis: "tf", val: +1 },
-        { t: "边安慰边想法", axis: "tf", val: 0 },
+        { t: "看情况（偏利弊）", axis: "tf", val: +0.25 },
         { t: "先照顾情绪", axis: "tf", val: -1 },
       ]},
       { sec: "decide", text: "发生分歧时，你更在意？", opts: [
         { t: "对不对/合不合理", axis: "tf", val: +1 },
-        { t: "都要兼顾", axis: "tf", val: 0 },
+        { t: "说不清（偏和气）", axis: "tf", val: -0.25 },
         { t: "和不和气/舒不舒服", axis: "tf", val: -1 },
       ]},
       { sec: "decide", text: "评价一次“做得好”，你更偏向？", opts: [
         { t: "结果有没有达标", axis: "tf", val: +1 },
-        { t: "结果过程都看", axis: "tf", val: 0 },
+        { t: "一般都行（偏结果）", axis: "tf", val: +0.25 },
         { t: "过程体验好不好", axis: "tf", val: -1 },
+      ]},
+      { sec: "decide", text: "朋友难过时，你更像？", opts: [
+        { t: "先给解决方案", axis: "tf", val: +1 },
+        { t: "先陪一会（偏共情）", axis: "tf", val: -0.25 },
+        { t: "先安慰和陪伴", axis: "tf", val: -1 },
       ]},
 
       // 计划/随性（J/P）
       { sec: "life", text: "出门/旅行你更像？", opts: [
         { t: "先把计划排好", axis: "jp", val: +1 },
-        { t: "有个大概就行", axis: "jp", val: 0 },
+        { t: "随便走走（偏随机）", axis: "jp", val: -0.25 },
         { t: "到了再随机应变", axis: "jp", val: -1 },
       ]},
       { sec: "life", text: "遇到截止时间，你更常？", opts: [
         { t: "提前搞定更安心", axis: "jp", val: +1 },
-        { t: "按节奏稳稳做完", axis: "jp", val: 0 },
+        { t: "看当天状态（偏提前）", axis: "jp", val: +0.25 },
         { t: "临近才会爆发", axis: "jp", val: -1 },
       ]},
       { sec: "life", text: "计划被打乱时你更像？", opts: [
         { t: "立刻重排到可控", axis: "jp", val: +1 },
-        { t: "先稳住再调整", axis: "jp", val: 0 },
+        { t: "先拖一拖（偏顺势）", axis: "jp", val: -0.25 },
         { t: "顺势改就行", axis: "jp", val: -1 },
+      ]},
+      { sec: "life", text: "你的桌面/房间更像？", opts: [
+        { t: "整齐有序", axis: "jp", val: +1 },
+        { t: "一般（偏整齐）", axis: "jp", val: +0.25 },
+        { t: "随手一放也行", axis: "jp", val: -1 },
       ]},
     ];
 
@@ -332,6 +375,9 @@
     const btnReset = $("btnReset");
     const btnRetake = $("btnRetake");
     const btnReset2 = $("btnRetake");
+    const shareModal = $("shareModal");
+    const shareModalImg = $("shareModalImg");
+    const btnCloseModal = $("btnCloseModal");
 
     function initScore(){
       const s = {};
@@ -343,7 +389,7 @@
 
     function recalcScoreFromAnswers(){
       const ax = axesFromAnswers();
-      score = scoreFromAxes(ax);
+      score = roundScore(scoreFromAxes(ax));
       renderKpis();
     }
 
@@ -355,7 +401,7 @@
         if (oi == null) continue;
         const opt = questions[i].opts[oi];
         if (!opt || !opt.axis) continue;
-        a[opt.axis] += opt.val;
+        a[opt.axis] += Number(opt.val);
         n[opt.axis] += 1;
       }
       for (const k of Object.keys(a)){
@@ -378,22 +424,37 @@
       };
     }
 
-    function renderKpis(){
-      kpis.innerHTML = "";
-      for (const d of dims){
-        const v = score[d.key];
-        const box = document.createElement("div");
-        box.className = "box";
-        box.innerHTML = `
-          <div class="label">${d.name}</div>
-          <div class="val">${v}/100 <span style="color:var(--muted);font-size:12px">（${v<50?d.low:d.high}）</span></div>
-          <div class="progress" style="margin-top:8px;height:8px">
-            <div class="bar" style="width:${v}%;background:linear-gradient(90deg,#38bdf8,#34d399)"></div>
-          </div>
-        `;
-        kpis.appendChild(box);
+    function roundScore(s){
+      // 所有展示数字统一用整数
+      return {
+        pace: Math.round(s.pace),
+        complex: Math.round(s.complex),
+        risk: Math.round(s.risk),
+        control: Math.round(s.control),
+        patience: Math.round(s.patience),
+      };
+    }
+
+    // 题目映射到画像的“可达范围”（由 scoreFromAxes 的系数推导）
+    // 目的：避免某些卡组向量落在“根本不可达”的区域导致命中=0
+    const REACH = {
+      pace: [14, 86],
+      complex: [20, 80],
+      risk: [18, 82],
+      control: [20, 80],
+      patience: [18, 82],
+    };
+
+    function clampDeckVecs(){
+      for (const deck of decks){
+        for (const k of Object.keys(REACH)){
+          const [lo, hi] = REACH[k];
+          deck.vec[k] = clamp(deck.vec[k], lo, hi);
+        }
       }
     }
+
+    function renderKpis(){ /* 已移除实时面板：保留空实现避免改动过大 */ }
 
     function renderQuestion(){
       const total = questions.length;
@@ -406,7 +467,8 @@
       // options
       let html = `<div class="opts">`;
       q.opts.forEach((o, i) => {
-        html += `<button type="button" class="opt" data-i="${i}">${o.t}</button>`;
+        const cls = (o.val === 0) ? "opt neutral" : "opt";
+        html += `<button type="button" class="${cls}" data-i="${i}">${o.t}</button>`;
       });
       html += `</div>`;
       quiz.innerHTML = `<div class="qtext" id="qtext">${q.text}</div>${html}`;
@@ -482,11 +544,24 @@
       return s;
     }
 
-    // ---- 均衡：让“落到某个卡组”的概率尽量平均（基于随机答题模拟做校准）----
-    // 注意：这不是完全随机分配，而是在“相似度匹配”的基础上加一个 per-deck 偏置项做均衡。
+    // ---- 均衡：让各卡组出现更平均（基于随机答题模拟做校准）----
+    // 注意：这是确定性结果（同一套答案→同一卡组），做的是“决策边界”的偏置校准。
     let deckBias = null; // Array<number>，与 decks 顺序一致
+    // 目标分布：尽量接近均匀（每套卡组概率相近）
+    // 偏置的放大系数：否则 bias 数值太小，难以改变“谁胜出”的结果边界
+    const BIAS_SCALE = 1000;
 
-    function randomInt(n){ return Math.floor(Math.random() * n); }
+    // 固定随机种子：保证“均衡校准”结果稳定（不影响答题结果本身，答题仍是确定性）
+    function mulberry32(seed){
+      return function(){
+        let t = seed += 0x6D2B79F5;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+    const CALIB_RAND = mulberry32(20260604);
+    function randomInt(n){ return Math.floor(CALIB_RAND() * n); }
 
     function simulateScoreOnce(){
       const tmpAnswers = [];
@@ -506,19 +581,24 @@
       let bestI = 0;
       let bestV = -Infinity;
       for (let i=0;i<decks.length;i++){
-        const v = -(dist2(sc, decks[i].vec)) + (bias ? bias[i] : 0);
+        const v = -(dist2(sc, decks[i].vec)) + (bias ? (bias[i] * BIAS_SCALE) : 0);
         if (v > bestV){ bestV = v; bestI = i; }
       }
       return bestI;
     }
 
+    function buildTargetProbs(){
+      const n = decks.length;
+      return Array(n).fill(1 / n);
+    }
+
     function calibrateDeckBias(){
       const n = decks.length;
       let bias = Array(n).fill(0);
-      const target = 1 / n;
-      const iters = 10;
-      const samples = 900; // 手机端更快一些
-      const lr = 1.4;
+      const target = buildTargetProbs();
+      const iters = 34;
+      const samples = 3200; // 更稳一点，压低“霸榜”卡组
+      const lr = 1.0;
 
       for (let it=0; it<iters; it++){
         const cnt = Array(n).fill(0);
@@ -529,8 +609,11 @@
         }
         for (let i=0;i<n;i++){
           const p = cnt[i] / samples;
-          bias[i] += lr * (target - p);
+          bias[i] += lr * (target[i] - p);
         }
+        // 消漂移：保持 bias 平均值为 0，避免整体平移
+        const mean = bias.reduce((a,b)=>a+b, 0) / n;
+        for (let i=0;i<n;i++) bias[i] -= mean;
       }
       return bias;
     }
@@ -544,7 +627,7 @@
       const ranked = decks
         .map((deck, i) => ({
           deck,
-          v: -(dist2(score, deck.vec)) + (deckBias ? deckBias[i] : 0),
+          v: -(dist2(score, deck.vec)) + (deckBias ? (deckBias[i] * BIAS_SCALE) : 0),
           d2: dist2(score, deck.vec),
         }))
         .sort((x,y) => y.v - x.v);
@@ -566,14 +649,14 @@
 
       // reset share UI
       shareDataUrl = null;
-      $("btnDownloadShare").disabled = true;
-      $("btnShareSystem").disabled = true;
       $("sharePreviewWrap").classList.add("hidden");
     }
+
 
     // ---- 分享图生成（canvas）----
     let lastResult = null;
     let shareDataUrl = null;
+    let shareBlobUrl = null;
 
     async function loadImageAsBitmap(url){
       // 尝试用 fetch 把图片转 blob 再画到 canvas，尽量规避跨域污染
@@ -630,25 +713,37 @@
       canvas.width = W; canvas.height = H;
       const ctx = canvas.getContext("2d");
 
-      // 背景
-      const g = ctx.createRadialGradient(W*0.28, H*0.12, 10, W*0.28, H*0.12, H*0.9);
-      g.addColorStop(0, "#13264d");
-      g.addColorStop(0.55, "#0b1220");
-      g.addColorStop(1, "#070c16");
+      // 背景（浅色活动页风）
+      const g = ctx.createRadialGradient(W*0.28, H*0.12, 10, W*0.28, H*0.12, H*0.95);
+      g.addColorStop(0, "#eaf2ff");
+      g.addColorStop(0.55, "#f6f8ff");
+      g.addColorStop(1, "#ffffff");
       ctx.fillStyle = g;
       ctx.fillRect(0,0,W,H);
 
+      // 轻微彩色光晕
+      const g2 = ctx.createRadialGradient(W*0.18, H*0.18, 10, W*0.18, H*0.18, 520);
+      g2.addColorStop(0, "rgba(37,99,235,0.18)");
+      g2.addColorStop(1, "rgba(37,99,235,0)");
+      ctx.fillStyle = g2;
+      ctx.fillRect(0,0,W,H);
+      const g3 = ctx.createRadialGradient(W*0.86, H*0.22, 10, W*0.86, H*0.22, 520);
+      g3.addColorStop(0, "rgba(6,182,212,0.14)");
+      g3.addColorStop(1, "rgba(6,182,212,0)");
+      ctx.fillStyle = g3;
+      ctx.fillRect(0,0,W,H);
+
       // 标题
-      ctx.fillStyle = "#e5e7eb";
+      ctx.fillStyle = "#0f172a";
       ctx.font = "700 52px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       ctx.fillText("测测你的卡组", 70, 120);
-      ctx.fillStyle = "#9ca3af";
+      ctx.fillStyle = "#475569";
       ctx.font = "400 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       ctx.fillText("你的推荐卡组", 70, 170);
 
       // 卡片容器
-      ctx.fillStyle = "rgba(9,14,26,0.55)";
-      ctx.strokeStyle = "rgba(34,49,79,1)";
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.strokeStyle = "rgba(219,227,255,1)";
       ctx.lineWidth = 2;
       roundRect(ctx, 60, 220, 960, 520, 34);
       ctx.fill();
@@ -658,17 +753,17 @@
       const bmp = await loadImageAsBitmap(iconUrl);
       if (bmp){
         // 头像底
-        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.fillStyle = "rgba(37,99,235,0.06)";
         roundRect(ctx, 90, 260, 180, 180, 34);
         ctx.fill();
         ctx.drawImage(bmp, 110, 280, 140, 140);
       }
 
       // 卡组名
-      ctx.fillStyle = "#e5e7eb";
+      ctx.fillStyle = "#0f172a";
       ctx.font = "800 54px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       ctx.fillText(deck.cn, 300, 325);
-      ctx.fillStyle = "#9ca3af";
+      ctx.fillStyle = "#64748b";
       ctx.font = "400 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       ctx.fillText(deck.en, 300, 375);
 
@@ -679,35 +774,35 @@
       for (const t of tags){
         const padX = 18, padY = 10;
         const w = ctx.measureText(t).width + padX*2;
-        ctx.fillStyle = "rgba(9,14,26,0.55)";
-        ctx.strokeStyle = "rgba(34,49,79,1)";
+        ctx.fillStyle = "rgba(243,246,255,1)";
+        ctx.strokeStyle = "rgba(219,227,255,1)";
         roundRect(ctx, tx, ty-28, w, 44, 22);
         ctx.fill(); ctx.stroke();
-        ctx.fillStyle = "#9ca3af";
+        ctx.fillStyle = "#475569";
         ctx.fillText(t, tx+padX, ty+2);
         tx += w + 12;
       }
 
       // 理由（取 deck.reason + 画像一句）
-      ctx.fillStyle = "#e5e7eb";
+      ctx.fillStyle = "#0f172a";
       ctx.font = "700 32px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       ctx.fillText("为什么适合你", 90, 500);
-      ctx.fillStyle = "#d1d5db";
+      ctx.fillStyle = "#334155";
       ctx.font = "400 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       const whyText = deck.reason;
       wrapText(ctx, whyText, 90, 550, 900, 42, 4);
 
       // 你的画像（用当前 score）
-      ctx.fillStyle = "rgba(9,14,26,0.55)";
-      ctx.strokeStyle = "rgba(34,49,79,1)";
+      ctx.fillStyle = "rgba(255,255,255,0.92)";
+      ctx.strokeStyle = "rgba(219,227,255,1)";
       roundRect(ctx, 60, 780, 960, 360, 34);
       ctx.fill(); ctx.stroke();
 
-      ctx.fillStyle = "#9ca3af";
+      ctx.fillStyle = "#64748b";
       ctx.font = "600 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
-      ctx.fillText("你的风格画像（0-100）", 90, 845);
+      ctx.fillText("你的训练家风格（0-100）", 90, 845);
 
-      ctx.fillStyle = "#e5e7eb";
+      ctx.fillStyle = "#0f172a";
       ctx.font = "500 30px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       const sp = {
         pace: Math.round(score.pace),
@@ -717,11 +812,11 @@
         patience: Math.round(score.patience),
       };
       const lines = [
-        `行动速度  ${sp.pace}`,
-        `思考复杂度  ${sp.complex}`,
-        `冒险倾向  ${sp.risk}`,
-        `掌控倾向  ${sp.control}`,
-        `耐心/长期主义  ${sp.patience}`,
+        `出手速度  ${sp.pace}`,
+        `线路感  ${sp.complex}`,
+        `搏命值  ${sp.risk}`,
+        `控场欲  ${sp.control}`,
+        `续航力  ${sp.patience}`,
       ];
       let yy = 905;
       for (const l of lines){
@@ -730,23 +825,22 @@
       }
 
       // 署名
-      ctx.fillStyle = "#9ca3af";
+      ctx.fillStyle = "#64748b";
       ctx.font = "400 28px system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial";
       ctx.fillText("by 牛油果", 90, 1240);
       ctx.fillText("数据：Limitless（BRS–SSP）", 90, 1290);
 
       shareDataUrl = canvas.toDataURL("image/png");
+      // 生成 blob url：更适合在微信里“点开大图/长按保存”
+      try{
+        if (shareBlobUrl) URL.revokeObjectURL(shareBlobUrl);
+        const blob = dataUrlToBlob(shareDataUrl);
+        shareBlobUrl = URL.createObjectURL(blob);
+      }catch(e){
+        shareBlobUrl = null;
+      }
       $("sharePreview").src = shareDataUrl;
       $("sharePreviewWrap").classList.remove("hidden");
-      $("btnDownloadShare").disabled = false;
-
-      // Web Share（支持则启用）
-      if (navigator.canShare && navigator.canShare({ files: [new File([], "x.png")] })){
-        $("btnShareSystem").disabled = false;
-      } else if (navigator.share){
-        // 某些浏览器只有 share，无 canShare(files)；仍尝试启用
-        $("btnShareSystem").disabled = false;
-      }
     }
 
     function dataUrlToBlob(dataUrl){
@@ -757,6 +851,17 @@
       const u8 = new Uint8Array(n);
       while(n--) u8[n] = bstr.charCodeAt(n);
       return new Blob([u8], { type: mime });
+    }
+
+    function openShareModal(){
+      const url = shareDataUrl;
+      if (!url) return;
+      shareModalImg.src = url;
+      shareModal.classList.add("show");
+    }
+
+    function closeShareModal(){
+      shareModal.classList.remove("show");
     }
 
     function renderDeck(deck, isBest){
@@ -782,7 +887,7 @@
         <div style="margin-top:10px;font-weight:700">为什么适合你</div>
         <ul class="why">${why}</ul>
         <div class="small" style="margin-top:10px">
-          性格画像：行动速度 ${deck.vec.pace} / 思考复杂度 ${deck.vec.complex} / 冒险 ${deck.vec.risk} / 掌控 ${deck.vec.control} / 耐心 ${deck.vec.patience}
+          训练家风格：出手速度 ${deck.vec.pace} / 线路感 ${deck.vec.complex} / 搏命值 ${deck.vec.risk} / 控场欲 ${deck.vec.control} / 续航力 ${deck.vec.patience}
         </div>
       `;
     }
@@ -793,20 +898,20 @@
       const s = score;
       if (deck.vec.pace >= 70){
         lines.push(s.pace >= 55
-          ? "你偏向快速推进、喜欢尽快看到结果；这套属于快节奏体系，更能把你的行动力转化为优势。"
-          : "即使你不算特别急，这套也能用“速度与主动”帮你减少被动挨打的时刻。");
+          ? "你出手很快，喜欢把节奏握在自己手里；这套更能把你的“神速”打成优势。"
+          : "你不一定特别急，但这套能帮你更主动，减少被动挨打。");
       } else if (deck.vec.pace <= 35){
         lines.push(s.patience >= 60
-          ? "你能做长线决策、愿意慢慢滚雪球；这套偏慢速/控制，越往后越能体现耐心与掌控感。"
-          : "这套节奏偏慢：更适合你把注意力放在稳定与可控上，而不是拼速度。");
+          ? "你续航力强，能打耐久战；这套偏慢速/控场，越往后越能体现你的运营。"
+          : "这套偏慢，更适合稳稳控住局面而不是拼速度。");
       } else {
-        lines.push("你更像均衡型：既想推进也不想莽；这套中速卡组能让你在不同对局里更灵活地切换策略。");
+        lines.push("你更像均衡型：既想推进也不想莽；这套能让你在不同对局里更灵活地换策略。");
       }
 
       if (deck.vec.complex >= 80){
         lines.push(s.complex >= 60
-          ? "你享受“多路线选择”的烧脑过程；它的线路/取舍多，强度很吃操作与对局理解。"
-          : "它的路线较多：即使你不追求极致复杂，也能通过学习逐步提升上限。");
+          ? "你线路感很强，喜欢多分支选择；它的路线/取舍多，很吃操作与对局理解。"
+          : "它的路线较多：即使你不追求极致复杂，也能慢慢练出上限。");
       } else if (deck.vec.complex <= 40){
         lines.push("它的核心思路直观，决策负担低，更容易把注意力放在“推进与执行”上。");
       } else {
@@ -815,8 +920,8 @@
 
       if (deck.vec.control >= 75){
         lines.push(s.control >= 55
-          ? "你有较强的“掌控倾向”，喜欢把局面握在手里；这套的核心就是限制与拆解对手的推进。"
-          : "这套偏限制型：即使你不是典型控制型玩家，也能用它把对手的关键节点按住。");
+          ? "你控场欲很强，喜欢把局面握在手里；这套的核心就是限制与拆解对手推进。"
+          : "这套偏控：即使你不是典型控场玩家，也能把对手关键节点按住。");
       } else if (deck.vec.control <= 30){
         lines.push("它更偏正面推进与压制：用持续压力迫使对手跟着你的节奏走。");
       } else {
@@ -850,36 +955,36 @@
         await generateShareImage();
       }finally{
         $("btnMakeShare").disabled = false;
-        $("btnMakeShare").textContent = "生成分享图";
+        $("btnMakeShare").textContent = "重新生成";
       }
     });
 
-    $("btnDownloadShare").addEventListener("click", () => {
-      if (!shareDataUrl) return;
-      const a = document.createElement("a");
-      a.href = shareDataUrl;
-      a.download = "ptcg-quiz-result.png";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+    $("btnOpenShare").addEventListener("click", () => {
+      // 改成弹层展示：微信内最稳（长按保存/转发）
+      // 若还没生成，则点击时现生成再打开
+      (async () => {
+        if (!shareDataUrl){
+          $("btnOpenShare").disabled = true;
+          const old = $("btnOpenShare").textContent;
+          $("btnOpenShare").textContent = "生成中…";
+          try{
+            await generateShareImage();
+          }finally{
+            $("btnOpenShare").disabled = false;
+            $("btnOpenShare").textContent = old;
+          }
+        }
+        openShareModal();
+      })();
     });
 
-    $("btnShareSystem").addEventListener("click", async () => {
-      if (!shareDataUrl || !navigator.share) return;
-      try{
-        const blob = dataUrlToBlob(shareDataUrl);
-        const file = new File([blob], "ptcg-quiz-result.png", { type: "image/png" });
-        await navigator.share({
-          title: "测测你的卡组",
-          text: "我测出来的卡组推荐（by 牛油果）",
-          files: [file],
-        });
-      }catch(e){
-        // 用户取消也会走到这里，不提示
-      }
+    btnCloseModal && btnCloseModal.addEventListener("click", closeShareModal);
+    shareModal && shareModal.addEventListener("click", (e) => {
+      if (e.target === shareModal) closeShareModal();
     });
 
     // init
+    clampDeckVecs();
     renderKpis();
     btnBack.disabled = true;
     // 预先做一次均衡校准（同步执行，控制在可接受耗时）
