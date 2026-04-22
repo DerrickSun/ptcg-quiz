@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PTCG 卡组性格测试（原型）</title>
+  <style>
+    :root{
+      --bg:#0b1220;--card:#111a2e;--card2:#0f172a;--text:#e5e7eb;--muted:#9ca3af;
+      --accent:#60a5fa;--accent2:#34d399;--danger:#fb7185;--border:#22314f;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;background:radial-gradient(1200px 700px at 30% 10%, #13264d 0%, var(--bg) 55%);color:var(--text)}
+    a{color:var(--accent);text-decoration:none}
+    a:hover{text-decoration:underline}
+    .wrap{max-width:980px;margin:0 auto;padding:28px 18px 60px}
+    .topbar{display:flex;gap:14px;align-items:flex-start;justify-content:space-between;margin-bottom:18px}
+    .title h1{font-size:22px;margin:0 0 6px}
+    .title p{margin:0;color:var(--muted);line-height:1.4}
+    .pill{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border);border-radius:999px;background:rgba(17,26,46,.65);color:var(--muted);font-size:12px}
+    .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:14px}
+    @media (max-width: 900px){.grid{grid-template-columns:1fr}}
+    .card{background:linear-gradient(180deg, rgba(17,26,46,.92), rgba(15,23,42,.92));border:1px solid var(--border);border-radius:16px;padding:18px;box-shadow:0 12px 30px rgba(0,0,0,.28)}
+    .progress{height:10px;background:#0a0f1c;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+    .bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .25s ease}
+    .qhead{display:flex;align-items:center;justify-content:space-between;margin-top:14px;gap:10px}
+    .qnum{color:var(--muted);font-size:12px}
+    .qtext{font-size:18px;line-height:1.4;margin:8px 0 12px}
+    .opts{display:grid;gap:10px}
+    button.opt{
+      text-align:left;cursor:pointer;border-radius:14px;border:1px solid var(--border);
+      padding:12px 14px;background:rgba(9,14,26,.6);color:var(--text);line-height:1.35;
+      transition:transform .05s ease, border-color .2s ease, background .2s ease;
+    }
+    button.opt:hover{border-color:#315a98;background:rgba(12,18,34,.85)}
+    button.opt:active{transform:translateY(1px)}
+    .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+    .btn{
+      cursor:pointer;border-radius:12px;border:1px solid var(--border);
+      padding:10px 12px;background:rgba(9,14,26,.6);color:var(--text)
+    }
+    .btn:hover{border-color:#315a98}
+    .btn.primary{border-color:#2a67c7;background:rgba(33,95,196,.25)}
+    .btn.danger{border-color:#7f2334;background:rgba(251,113,133,.12)}
+    .small{font-size:12px;color:var(--muted);line-height:1.5}
+    .hidden{display:none !important}
+    .kpi{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
+    .kpi .box{border:1px solid var(--border);border-radius:14px;padding:10px;background:rgba(9,14,26,.45)}
+    .kpi .label{color:var(--muted);font-size:12px}
+    .kpi .val{font-size:14px;margin-top:3px}
+    .tag{display:inline-flex;align-items:center;padding:4px 8px;border-radius:999px;border:1px solid var(--border);background:rgba(9,14,26,.5);font-size:12px;color:var(--muted);margin-right:6px;margin-top:6px}
+    .result-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap}
+    .result-title h2{margin:0;font-size:20px}
+    .deckcard{margin-top:14px;border:1px solid var(--border);border-radius:16px;padding:14px;background:rgba(9,14,26,.45)}
+    .deckname{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+    .deckname .cn{font-weight:700}
+    .deckname .en{color:var(--muted)}
+    .deckhero{display:flex;gap:12px;align-items:center}
+    .deckimg{
+      width:84px;height:84px;flex:0 0 84px;border-radius:14px;
+      border:1px solid var(--border);background:rgba(255,255,255,.04);
+      padding:10px;object-fit:contain;
+    }
+    .deckimg.small{width:56px;height:56px;flex-basis:56px;padding:8px;border-radius:12px}
+    .why{margin:10px 0 0;padding-left:18px;color:var(--text);line-height:1.55}
+    .why li{margin:6px 0}
+    .alts{display:grid;gap:10px;margin-top:12px}
+    .alts .alt{border:1px solid var(--border);border-radius:14px;padding:12px;background:rgba(9,14,26,.35)}
+    .footer-note{margin-top:14px;padding:10px 12px;border-radius:12px;border:1px dashed #35527b;color:var(--muted);background:rgba(9,14,26,.25);line-height:1.55}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="title">
+        <h1>PTCG 卡组性格测试（原型）</h1>
+        <p>10道题，给你分配一套「适合你性格」的标准赛制卡组（BRS–SSP，参考 Limitless 全时期积分榜前20）。</p>
+      </div>
+      <div class="pill" id="formatPill">数据源：Limitless（BRS–SSP）</div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="progress" aria-label="进度条"><div class="bar" id="bar"></div></div>
+        <div class="qhead">
+          <div class="qnum" id="qnum">准备开始</div>
+          <div class="row">
+            <button class="btn" id="btnBack" type="button">上一步</button>
+            <button class="btn danger" id="btnReset" type="button">重来</button>
+          </div>
+        </div>
+        <div id="quiz">
+          <div class="qtext" id="qtext">点击「开始测试」进入题目。</div>
+          <div class="row">
+            <button class="btn primary" id="btnStart" type="button">开始测试</button>
+          </div>
+        </div>
+
+        <div id="result" class="hidden">
+          <div class="result-title">
+            <h2>你的推荐卡组</h2>
+            <div class="row">
+              <button class="btn primary" id="btnRetake" type="button">再测一次</button>
+            </div>
+          </div>
+          <div class="deckcard" id="bestCard"></div>
+          <div class="deckcard">
+            <div style="font-weight:700;margin-bottom:8px;">备选推荐（Top 3 匹配）</div>
+            <div class="alts" id="alts"></div>
+          </div>
+          <div class="footer-note">
+            这是一个可快速校验逻辑的原型：<b>中文译名、题目倾向、卡组标签都可以你来改</b>。你看完后告诉我：哪些译名要换、哪些卡组更应该“快攻/控制/复杂”，我再按你的口径精修。
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="font-weight:700">你的性格维度（实时）</div>
+        <div class="small">每题都会影响 5 个维度。最后用“最接近”的性格画像去匹配更适合你的卡组节奏。</div>
+        <div class="kpi" id="kpis"></div>
+        <div style="margin-top:12px;font-weight:700">维度解释</div>
+        <div class="small" style="margin-top:6px">
+          <div><b>行动速度</b>：越高越“先做再说”，喜欢快速推进。</div>
+          <div><b>思考复杂度</b>：越高越爱规划/推演，享受多方案与细节。</div>
+          <div><b>冒险倾向</b>：越高越敢赌一把，用波动换取上限。</div>
+          <div><b>掌控倾向</b>：越高越想掌控局面（规则/限制/把变量握在手里）。</div>
+          <div><b>耐心/长期主义</b>：越高越能做长线决策，愿意慢慢滚雪球。</div>
+        </div>
+        <div style="margin-top:12px" class="small">
+          数据链接：<a href="https://limitlesstcg.com/decks?time=all&type=all&format=BRS-SSP&region=all&division=all" target="_blank" rel="noreferrer">Limitless Decks（BRS–SSP）</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 维度：0-100
+    const dims = [
+      { key: "pace", name: "行动速度", low: "慢热", high: "快节奏" },
+      { key: "complex", name: "思考复杂度", low: "直觉派", high: "策略派" },
+      { key: "risk", name: "冒险倾向", low: "求稳", high: "敢赌" },
+      { key: "control", name: "掌控倾向", low: "随性", high: "强掌控" },
+      { key: "patience", name: "耐心/长期主义", low: "短线", high: "长线" },
+    ];
+
+    // Limitless 前20（BRS–SSP，time=all）——原型：中文译名与标签可后续按你口径校验/调整
+    const decks = [
+      { id: 260, en: "Regidrago VSTAR", cn: "雷吉铎拉戈VSTAR", icon: "regidrago", tags: ["工具箱","高上限","线路多"],
+        vec: { pace: 55, complex: 85, risk: 70, control: 45, patience: 60 },
+        reason: "多路线工具箱：根据对局选择不同招式与线路，适合爱规划、临场应变强的人。" },
+      { id: 264, en: "Charizard ex", cn: "喷火龙ex", icon: "charizard", tags: ["中速","稳定","强终结"],
+        vec: { pace: 60, complex: 55, risk: 45, control: 40, patience: 55 },
+        reason: "节奏稳定、容错高：前中期铺垫，后期火力强，适合“想稳又想赢得干净”的风格。" },
+      { id: 255, en: "Gardevoir ex", cn: "沙奈朵ex", icon: "gardevoir", tags: ["长局","资源管理","操作细"],
+        vec: { pace: 40, complex: 85, risk: 55, control: 55, patience: 85 },
+        reason: "资源与顺序细节很多，常要算伤害与资源回收；耐心型玩家会越打越强。" },
+      { id: 269, en: "Klawf Unhinged Scissors", cn: "毛崖蟹（失控剪刀）", icon: "klawf", tags: ["节奏","爆发","灵活单奖"],
+        vec: { pace: 75, complex: 55, risk: 65, control: 35, patience: 40 },
+        reason: "节奏快、抓窗口能力强；适合喜欢快速施压、敢在关键回合搏一把的人。" },
+      { id: 247, en: "Lugia Archeops", cn: "洛奇亚/始祖大鸟", icon: "lugia", tags: ["展开","上限高","爆发"],
+        vec: { pace: 65, complex: 65, risk: 70, control: 35, patience: 50 },
+        reason: "成型后爆发强，但更吃展开与时机；适合喜欢“做成就翻盘”的打法。" },
+      { id: 280, en: "Raging Bolt ex", cn: "猛雷鼓ex", icon: "raging-bolt", tags: ["快攻","直来直去","压血线"],
+        vec: { pace: 90, complex: 40, risk: 60, control: 25, patience: 25 },
+        reason: "开局就想打出节奏、迅速换取奖赏；适合急性子、偏进攻的人。" },
+      { id: 259, en: "Snorlax Stall PGO", cn: "卡比兽消耗（Stall）", icon: "snorlax", tags: ["消耗","锁资源","超长局"],
+        vec: { pace: 10, complex: 70, risk: 35, control: 95, patience: 95 },
+        reason: "通过限制与消耗让对手逐步失去行动；适合非常有耐心、喜欢掌控节奏的人。" },
+      { id: 292, en: "Terapagos ex", cn: "太乐巴戈斯ex（太晶龟）", icon: "terapagos", tags: ["中速","变招","稳中求胜"],
+        vec: { pace: 55, complex: 60, risk: 45, control: 45, patience: 60 },
+        reason: "玩法偏中速与适配：既能打正面也能调节线路，适合不想被单一思路限制的人。" },
+      { id: 284, en: "Dragapult ex", cn: "多龙巴鲁托ex", icon: "dragapult", tags: ["节奏","点杀/铺伤","对局理解"],
+        vec: { pace: 65, complex: 70, risk: 50, control: 55, patience: 60 },
+        reason: "需要把握节奏与伤害分配；适合心细、喜欢“每回合都做正确事”的玩家。" },
+      { id: 315, en: "Archaludon ex", cn: "铝钢龙ex", icon: "archaludon", tags: ["耐久","对抗快攻","慢速滚雪球"],
+        vec: { pace: 40, complex: 60, risk: 40, control: 55, patience: 75 },
+        reason: "偏防守与耐久，对位与资源节奏重要；适合稳健、愿意慢慢扩大优势的人。" },
+      { id: 267, en: "Gholdengo ex", cn: "赛富豪ex", icon: "gholdengo", tags: ["爆发","手牌管理","组合"],
+        vec: { pace: 60, complex: 75, risk: 65, control: 35, patience: 55 },
+        reason: "靠资源转换打爆发，手牌与资源管理关键；适合喜欢“算牌/算线”的人。" },
+      { id: 227, en: "Palkia VSTAR", cn: "帕路奇亚VSTAR", icon: "palkia", tags: ["中速","稳定","场面控制"],
+        vec: { pace: 60, complex: 55, risk: 45, control: 45, patience: 55 },
+        reason: "稳定中速：既能快速进入战斗，也能做场面运营；适合均衡型玩家。" },
+      { id: 268, en: "Roaring Moon ex", cn: "轰鸣月ex", icon: "roaring-moon", tags: ["快攻","高压","换血取胜"],
+        vec: { pace: 85, complex: 55, risk: 75, control: 30, patience: 30 },
+        reason: "用高压节奏逼对手失误，但也更吃取舍；适合敢换血、追求压制的人。" },
+      { id: 241, en: "Lost Zone Box", cn: "LTB", icon: "comfey", tags: ["超高操作","多分支","节奏"],
+        vec: { pace: 75, complex: 95, risk: 60, control: 55, patience: 65 },
+        reason: "选择题很多：每回合都在做路线决策；适合享受高强度思考与微操的人。" },
+      { id: 276, en: "Pidgeot Control", cn: "大比鸟控制", icon: "pidgeot", tags: ["控制","针对性强","读牌"],
+        vec: { pace: 25, complex: 85, risk: 40, control: 90, patience: 85 },
+        reason: "更像“解题”：通过限制与针对组件拆掉对手；适合喜欢把对手锁死的人。" },
+      { id: 283, en: "Iron Thorns ex", cn: "铁荆棘ex", icon: "iron-thorns", tags: ["干扰","半控制","反展开"],
+        vec: { pace: 45, complex: 60, risk: 45, control: 75, patience: 65 },
+        reason: "通过干扰破坏对手展开；适合喜欢对抗、爱找对手别扭但又不想极端长局的人。" },
+      { id: 273, en: "Ancient Box", cn: "古代box", icon: "koraidon", tags: ["节奏","稳中带爆发","单奖/多奖混"],
+        vec: { pace: 70, complex: 70, risk: 60, control: 40, patience: 55 },
+        reason: "节奏与运营并存：既要压节奏也要管资源；适合“能快也能稳”的人。" },
+      { id: 257, en: "Miraidon ex", cn: "密勒顿ex", icon: "miraidon", tags: ["快攻","展开简单","打点直接"],
+        vec: { pace: 85, complex: 35, risk: 55, control: 25, patience: 25 },
+        reason: "展开直观，主打速度与打点；适合喜欢干脆利落、不想纠结太多的人。" },
+      { id: 299, en: "Ceruledge ex", cn: "红莲铠骑ex", icon: "ceruledge", tags: ["进攻","节奏","爆发回合"],
+        vec: { pace: 75, complex: 55, risk: 65, control: 30, patience: 40 },
+        reason: "靠关键回合打出爆发与转折；适合喜欢抓时机、追求爽感的人。" },
+      { id: 290, en: "Cornerstone Ogerpon ex", cn: "基石面具厄鬼椪ex", icon: "ogerpon-cornerstone", tags: ["中速","对抗面广","稳健"],
+        vec: { pace: 55, complex: 55, risk: 40, control: 50, patience: 65 },
+        reason: "更偏均衡与对抗：稳健推进、适配对局；适合细心但不想过度烧脑的玩家。" },
+    ];
+
+    // 10 道性格题（参考 SBTI：分小模块、句子更口语；不涉及具体打牌内容）
+    const questions = [
+      {
+        sec: "word",
+        text: "我更像哪一种？",
+        opts: [
+          { t: "先冲了再说", d: { pace:+14, risk:+8, control:-2, patience:-10, complex:-2 } },
+          { t: "看情况（都行）", d: { pace:+2, risk:0, control:0, patience:+2, complex:+2 } },
+          { t: "先等等，想清楚再动", d: { pace:-10, risk:-8, control:+4, patience:+10, complex:+6 } },
+        ],
+      },
+      {
+        sec: "word",
+        text: "做事风格更像哪边？",
+        opts: [
+          { t: "随缘派：差不多就行", d: { control:-12, pace:+4, patience:-2, risk:+4, complex:-2 } },
+          { t: "平衡派：别极端就好", d: { control:+2, pace:+2, patience:+2, risk:0, complex:+2 } },
+          { t: "掌控派：我要把变量管住", d: { control:+16, pace:-2, patience:+8, risk:-4, complex:+6 } },
+        ],
+      },
+      {
+        sec: "judge",
+        text: "我很难忍受拖延：想到就想马上去做。",
+        opts: [
+          { t: "不认同", d: { pace:-10, patience:+10, complex:+4, risk:-2, control:+2 } },
+          { t: "中立", d: { pace:+4, patience:+2, complex:+2, risk:0, control:0 } },
+          { t: "认同", d: { pace:+16, patience:-12, complex:-4, risk:+2, control:-2 } },
+        ],
+      },
+      {
+        sec: "judge",
+        text: "我做事喜欢先想清楚“每一步为什么”，不太爱瞎试。",
+        opts: [
+          { t: "不认同", d: { complex:-10, pace:+6, risk:+6, patience:-6, control:-2 } },
+          { t: "中立", d: { complex:+2, pace:+2, risk:0, patience:+2, control:+2 } },
+          { t: "认同", d: { complex:+14, pace:-2, risk:-6, patience:+10, control:+6 } },
+        ],
+      },
+      {
+        sec: "judge",
+        text: "我宁愿稳定一点，也不想为了上限把自己搞得很焦虑。",
+        opts: [
+          { t: "不认同", d: { risk:+14, pace:+4, patience:-4, complex:+2, control:-2 } },
+          { t: "中立", d: { risk:+2, pace:+2, patience:+2, complex:+2, control:0 } },
+          { t: "认同", d: { risk:-14, pace:-2, patience:+10, complex:+4, control:+2 } },
+        ],
+      },
+      {
+        sec: "judge",
+        text: "我挺吃“把局面握在手里”的感觉：规则清楚、流程清楚，我就舒服。",
+        opts: [
+          { t: "不认同", d: { control:-10, pace:+6, patience:-2, risk:+4, complex:-2 } },
+          { t: "中立", d: { control:+4, pace:+2, patience:+2, risk:0, complex:+2 } },
+          { t: "认同", d: { control:+18, pace:-4, patience:+10, risk:-4, complex:+6 } },
+        ],
+      },
+      {
+        sec: "desc",
+        text: "朋友临时喊你出门，你更像？",
+        opts: [
+          { t: "立刻走：现在就出发！", d: { pace:+14, risk:+4, patience:-10, complex:-2, control:-2 } },
+          { t: "看心情：我得先感受一下。", d: { pace:+2, risk:+2, patience:+2, complex:+2, control:-2 } },
+          { t: "先安排：把手头的事收个尾再去。", d: { pace:-4, risk:-4, patience:+12, complex:+8, control:+6 } },
+        ],
+      },
+      {
+        sec: "desc",
+        text: "计划被打乱了（比如突然加了很多事），你更像？",
+        opts: [
+          { t: "先硬顶：把最急的先弄完。", d: { pace:+12, risk:+6, patience:-8, complex:-2, control:+2 } },
+          { t: "先理清：把事情拆开排个序。", d: { pace:+2, risk:-2, patience:+8, complex:+10, control:+6 } },
+          { t: "先稳住：别慌，先保证不出大错。", d: { pace:-4, risk:-10, patience:+12, complex:+4, control:+4 } },
+        ],
+      },
+      {
+        sec: "desc",
+        text: "你更常被朋友吐槽哪一句？",
+        opts: [
+          { t: "“你怎么这么急！”", d: { pace:+14, risk:+4, patience:-10, complex:-2, control:-2 } },
+          { t: "“你怎么这么爱想（想太多）！”", d: { complex:+14, pace:+2, patience:+6, risk:-2, control:+2 } },
+          { t: "“你怎么这么爱控制/爱管细节！”", d: { control:+14, complex:+6, patience:+6, pace:-2, risk:-4 } },
+        ],
+      },
+      {
+        sec: "final",
+        text: "终测题：你更希望别人怎么评价你？",
+        opts: [
+          { t: "“你出手好快，压迫感拉满。”", d: { pace:+16, risk:+6, patience:-12, complex:-2, control:-2 } },
+          { t: "“你很稳，很少翻车。”", d: { pace:+2, risk:-10, patience:+14, complex:+4, control:+2 } },
+          { t: "“你很会控局，节奏都在你手里。”", d: { pace:-4, risk:-4, patience:+10, complex:+6, control:+16 } },
+        ],
+      },
+    ];
+
+    const sectionNames = { word: "词对题", judge: "判断题", desc: "描述题", final: "终测题" };
+    function sectionProgress(i){
+      const sec = questions[i]?.sec ?? "judge";
+      let total = 0, before = 0;
+      for (let k=0;k<questions.length;k++){
+        if (questions[k].sec === sec) total++;
+        if (k < i && questions[k].sec === sec) before++;
+      }
+      return { sec, secName: sectionNames[sec] ?? sec, pos: before + 1, total };
+    }
+
+    // --- 状态 ---
+    let idx = -1;
+    let answers = []; // 每题选择的 option index
+    let score = initScore();
+
+    // --- UI refs ---
+    const $ = (id) => document.getElementById(id);
+    const bar = $("bar");
+    const qnum = $("qnum");
+    const qtext = $("qtext");
+    const quiz = $("quiz");
+    const result = $("result");
+    const kpis = $("kpis");
+    const btnStart = $("btnStart");
+    const btnBack = $("btnBack");
+    const btnReset = $("btnReset");
+    const btnRetake = $("btnRetake");
+    const btnReset2 = $("btnRetake");
+
+    function initScore(){
+      const s = {};
+      for (const d of dims) s[d.key] = 50; // 从中位数开始
+      return s;
+    }
+
+    function clamp(v,min,max){return Math.max(min,Math.min(max,v))}
+
+    function applyDelta(base, delta){
+      const out = {...base};
+      for (const d of dims){
+        const dv = delta?.[d.key] ?? 0;
+        out[d.key] = clamp(out[d.key] + dv, 0, 100);
+      }
+      return out;
+    }
+
+    function recalcScoreFromAnswers(){
+      let s = initScore();
+      for (let i=0;i<answers.length;i++){
+        const qi = questions[i];
+        const oi = answers[i];
+        if (oi == null) continue;
+        s = applyDelta(s, qi.opts[oi].d);
+      }
+      score = s;
+      renderKpis();
+    }
+
+    function renderKpis(){
+      kpis.innerHTML = "";
+      for (const d of dims){
+        const v = score[d.key];
+        const box = document.createElement("div");
+        box.className = "box";
+        box.innerHTML = `
+          <div class="label">${d.name}</div>
+          <div class="val">${v}/100 <span style="color:var(--muted);font-size:12px">（${v<50?d.low:d.high}）</span></div>
+          <div class="progress" style="margin-top:8px;height:8px">
+            <div class="bar" style="width:${v}%;background:linear-gradient(90deg,#38bdf8,#34d399)"></div>
+          </div>
+        `;
+        kpis.appendChild(box);
+      }
+    }
+
+    function renderQuestion(){
+      const total = questions.length;
+      const q = questions[idx];
+      const sp = sectionProgress(idx);
+      qnum.textContent = `${sp.secName} ${sp.pos}/${sp.total} · 第 ${idx+1}/${total} 题`;
+      qtext.textContent = q.text;
+      bar.style.width = `${Math.round(((idx) / total) * 100)}%`;
+
+      // options
+      let html = `<div class="opts">`;
+      q.opts.forEach((o, i) => {
+        html += `<button type="button" class="opt" data-i="${i}">${o.t}</button>`;
+      });
+      html += `</div>`;
+      quiz.innerHTML = `<div class="qtext" id="qtext">${q.text}</div>${html}`;
+
+      // rebind qtext ref (replaced)
+      const qtext2 = quiz.querySelector("#qtext");
+      qtext2 && (qtext2.id = "qtext"); // keep id stable
+
+      quiz.querySelectorAll("button.opt").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const i = Number(btn.getAttribute("data-i"));
+          answers[idx] = i;
+          recalcScoreFromAnswers();
+          next();
+        });
+      });
+
+      btnBack.disabled = idx <= 0;
+    }
+
+    function start(){
+      idx = 0;
+      answers = Array(questions.length).fill(null);
+      score = initScore();
+      result.classList.add("hidden");
+      quiz.classList.remove("hidden");
+      recalcScoreFromAnswers();
+      renderQuestion();
+    }
+
+    function reset(){
+      idx = -1;
+      answers = [];
+      score = initScore();
+      qnum.textContent = "准备开始";
+      bar.style.width = "0%";
+      result.classList.add("hidden");
+      quiz.classList.remove("hidden");
+      quiz.innerHTML = `
+        <div class="qtext" id="qtext">点击「开始测试」进入题目。</div>
+        <div class="row">
+          <button class="btn primary" id="btnStart2" type="button">开始测试</button>
+        </div>
+      `;
+      quiz.querySelector("#btnStart2").addEventListener("click", start);
+      renderKpis();
+      btnBack.disabled = true;
+    }
+
+    function next(){
+      if (idx < questions.length - 1){
+        idx++;
+        renderQuestion();
+        return;
+      }
+      finish();
+    }
+
+    function back(){
+      if (idx <= 0) return;
+      idx--;
+      renderQuestion();
+    }
+
+    function dist(a, b){
+      // 欧氏距离（可按需要加权）
+      let s = 0;
+      for (const d of dims){
+        const w = (d.key === "pace" || d.key === "control") ? 1.15 : 1.0;
+        const diff = (a[d.key] - b[d.key]);
+        s += w * diff * diff;
+      }
+      return Math.sqrt(s);
+    }
+
+    function finish(){
+      bar.style.width = "100%";
+      qnum.textContent = "完成";
+      quiz.classList.add("hidden");
+      result.classList.remove("hidden");
+
+      const ranked = decks
+        .map(deck => ({ deck, d: dist(score, deck.vec) }))
+        .sort((x,y) => x.d - y.d);
+
+      const best = ranked[0].deck;
+      const top3 = ranked.slice(0,3).map(x => x.deck);
+
+      $("bestCard").innerHTML = renderDeck(best, true);
+      const altsEl = $("alts");
+      altsEl.innerHTML = "";
+      top3.forEach((d, i) => {
+        const div = document.createElement("div");
+        div.className = "alt";
+        div.innerHTML = renderDeck(d, i === 0);
+        altsEl.appendChild(div);
+      });
+    }
+
+    function renderDeck(deck, isBest){
+      const url = `https://limitlesstcg.com/decks/${deck.id}`;
+      const tags = deck.tags.map(t => `<span class="tag">${t}</span>`).join("");
+      const iconUrl = `https://r2.limitlesstcg.net/pokemon/gen9/${deck.icon}.png`;
+
+      const why = buildWhy(deck);
+      return `
+        <div class="deckhero">
+          <img class="deckimg ${isBest ? "" : "small"}" src="${iconUrl}" alt="${deck.en}" loading="lazy" />
+          <div>
+            <div class="deckname">
+              <div class="cn">${isBest ? "✅ " : ""}${deck.cn}</div>
+              <div class="en">(${deck.en})</div>
+            </div>
+            <div class="small" style="margin-top:6px">${tags}</div>
+            <div class="small" style="margin-top:8px">
+              Limitless 链接：<a href="${url}" target="_blank" rel="noreferrer">${url}</a>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:10px;font-weight:700">为什么适合你</div>
+        <ul class="why">${why}</ul>
+        <div class="small" style="margin-top:10px">
+          性格画像：行动速度 ${deck.vec.pace} / 思考复杂度 ${deck.vec.complex} / 冒险 ${deck.vec.risk} / 掌控 ${deck.vec.control} / 耐心 ${deck.vec.patience}
+        </div>
+      `;
+    }
+
+    function buildWhy(deck){
+      // 用“你”的分数对齐 deck 的特点，给出自然语言理由（原型：规则可改）
+      const lines = [];
+      const s = score;
+      if (deck.vec.pace >= 70){
+        lines.push(s.pace >= 55
+          ? "你偏向快速推进、喜欢尽快看到结果；这套属于快节奏体系，更能把你的行动力转化为优势。"
+          : "即使你不算特别急，这套也能用“速度与主动”帮你减少被动挨打的时刻。");
+      } else if (deck.vec.pace <= 35){
+        lines.push(s.patience >= 60
+          ? "你能做长线决策、愿意慢慢滚雪球；这套偏慢速/控制，越往后越能体现耐心与掌控感。"
+          : "这套节奏偏慢：更适合你把注意力放在稳定与可控上，而不是拼速度。");
+      } else {
+        lines.push("你更像均衡型：既想推进也不想莽；这套中速卡组能让你在不同对局里更灵活地切换策略。");
+      }
+
+      if (deck.vec.complex >= 80){
+        lines.push(s.complex >= 60
+          ? "你享受“多路线选择”的烧脑过程；它的线路/取舍多，强度很吃操作与对局理解。"
+          : "它的路线较多：即使你不追求极致复杂，也能通过学习逐步提升上限。");
+      } else if (deck.vec.complex <= 40){
+        lines.push("它的核心思路直观，决策负担低，更容易把注意力放在“推进与执行”上。");
+      } else {
+        lines.push("复杂度适中：有思考空间但不至于一直爆脑，适合长期上手。");
+      }
+
+      if (deck.vec.control >= 75){
+        lines.push(s.control >= 55
+          ? "你有较强的“掌控倾向”，喜欢把局面握在手里；这套的核心就是限制与拆解对手的推进。"
+          : "这套偏限制型：即使你不是典型控制型玩家，也能用它把对手的关键节点按住。");
+      } else if (deck.vec.control <= 30){
+        lines.push("它更偏正面推进与压制：用持续压力迫使对手跟着你的节奏走。");
+      } else {
+        lines.push("它兼顾对抗与推进：既能打正面也能适度干扰，对局面覆盖更广。");
+      }
+
+      // 风险偏好补一句
+      if (deck.vec.risk >= 70){
+        lines.push("它的上限高但更吃关键时机的取舍；你越敢抓窗口，上限就越容易被你打出来。");
+      } else if (deck.vec.risk <= 40){
+        lines.push("它偏稳健容错：不太依赖“搏命一把”，更适合稳扎稳打。");
+      } else {
+        lines.push("波动与稳定相对平衡：既有爆发点，也能通过运营把胜率托住。");
+      }
+
+      // 加上 deck 自带一句“定位总结”
+      lines.push(deck.reason);
+      return lines.map(x => `<li>${x}</li>`).join("");
+    }
+
+    // --- events ---
+    btnStart.addEventListener("click", start);
+    btnBack.addEventListener("click", () => { back(); });
+    btnReset.addEventListener("click", reset);
+    btnRetake.addEventListener("click", start);
+
+    // init
+    renderKpis();
+    btnBack.disabled = true;
+  </script>
+</body>
+</html>
